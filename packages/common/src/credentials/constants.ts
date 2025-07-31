@@ -4,6 +4,7 @@ export const credentialNames = [
   "evm_pk_credentials",
   "rpc_credentials",
   "oneinch_credentials",
+  "anthropic_credentials",
 ] as const;
 export const credentialPropertyTypes = [
   "options",

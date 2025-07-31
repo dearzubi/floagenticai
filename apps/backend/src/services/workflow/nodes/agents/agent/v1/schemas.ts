@@ -1,17 +1,22 @@
 import { z } from "zod/v4";
-import { modelProviders } from "../model-providers/index.js";
-import { ModelProvider } from "../model-providers/types.js";
 import { openAICredentialsSchema } from "../../../../../credentials/credentials/openai-credentials/schemas.js";
 import { googleAICredentialsSchema } from "../../../../../credentials/credentials/googleai-credentials/schemas.js";
 import { AgentArtifacts } from "common";
+import { modelProviderNodeProperties } from "./model/node-properties/index.js";
+import { ModelProviderNodeProperties } from "./model/node-properties/types.js";
+import { anthropicCredentialsSchema } from "../../../../../credentials/credentials/anthropic-credentials/schemas.js";
 
-const openAIProvider = modelProviders.find(
+const openAIProviderProperties = modelProviderNodeProperties.find(
   (provider) => provider.name === "openai",
-) as ModelProvider;
+) as ModelProviderNodeProperties;
 
-const googleGenAiProvider = modelProviders.find(
+const googleGenAiProviderProperties = modelProviderNodeProperties.find(
   (provider) => provider.name === "google_gen_ai",
-) as ModelProvider;
+) as ModelProviderNodeProperties;
+
+const anthropicProviderProperties = modelProviderNodeProperties.find(
+  (provider) => provider.name === "anthropic",
+) as ModelProviderNodeProperties;
 
 export const commonModelSettingsSchema = z.object({
   temperature: z
@@ -65,12 +70,14 @@ export const inputSchema = z.object({
   enable_memory: z.boolean().nullish().default(true),
   instructions: z.string().nullish().default(""),
   input_message: z.string().nullish().default("Hello, how are you doing?"),
-  model_provider: z.enum(modelProviders.map((provider) => provider.name)),
+  model_provider: z.enum(
+    modelProviderNodeProperties.map((provider) => provider.name),
+  ),
   openai_model_settings: commonModelSettingsSchema
     .extend({
       model: z
         .enum(
-          openAIProvider.modelSettings
+          openAIProviderProperties.modelSettings
             .find((prop) => prop.name === "model")
             ?.options?.map((model) => model.name) ?? ["gpt-4.1-mini"],
         )
@@ -81,11 +88,24 @@ export const inputSchema = z.object({
     .extend({
       model: z
         .enum(
-          googleGenAiProvider.modelSettings
+          googleGenAiProviderProperties.modelSettings
             .find((prop) => prop.name === "model")
             ?.options?.map((model) => model.name) ?? ["gemini-2.5-flash"],
         )
         .transform((v) => v ?? "gemini-2.5-flash"),
+    })
+    .nullish(),
+  anthropic_model_settings: commonModelSettingsSchema
+    .extend({
+      model: z
+        .enum(
+          anthropicProviderProperties.modelSettings
+            .find((prop) => prop.name === "model")
+            ?.options?.map((model) => model.name) ?? [
+            "claude-sonnet-4-20250514",
+          ],
+        )
+        .transform((v) => v ?? "claude-sonnet-4-20250514"),
     })
     .nullish(),
   output_structure: z
@@ -99,7 +119,13 @@ export const outputSchema = z.object({
 });
 
 export const credentialsSchema = z
-  .array(z.union([openAICredentialsSchema, googleAICredentialsSchema]))
+  .array(
+    z.union([
+      openAICredentialsSchema,
+      googleAICredentialsSchema,
+      anthropicCredentialsSchema,
+    ]),
+  )
   .nonempty({ error: "Missing model credentials." });
 
 export type OutputsShape = z.infer<typeof outputSchema> & {

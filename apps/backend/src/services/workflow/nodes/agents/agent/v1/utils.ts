@@ -26,9 +26,14 @@ import { z } from "zod/v4";
 import { z as zodv3, ZodTypeAny } from "zod";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { aisdk } from "@openai/agents-extensions";
+import { createAnthropic } from "@ai-sdk/anthropic";
 
 type GoogleGenerativeAIModelId = Parameters<
   ReturnType<typeof createGoogleGenerativeAI>
+>["0"];
+
+type AnthropicMessagesModelId = Parameters<
+  ReturnType<typeof createAnthropic>
 >["0"];
 
 /**
@@ -217,29 +222,45 @@ export const getAPIKey = async (
   validatedInputs: z.infer<typeof inputSchema>,
   validatedCredentials: z.infer<typeof credentialsSchema>,
 ): Promise<string> => {
-  if (validatedInputs.model_provider === "openai") {
-    const openAIKey = validatedCredentials.find(
-      (credential) => credential.name === "open_ai_credentials",
-    )?.data?.api_key;
+  switch (validatedInputs.model_provider) {
+    case "openai": {
+      const openAIKey = validatedCredentials.find(
+        (credential) => credential.name === "open_ai_credentials",
+      )?.data?.api_key;
 
-    if (!openAIKey) {
-      throw new Error("OpenAI API key required");
+      if (!openAIKey) {
+        throw new Error("OpenAI API key required");
+      }
+
+      return openAIKey;
     }
+    case "google_gen_ai": {
+      const googleAIKey = validatedCredentials.find(
+        (credential) => credential.name === "google_ai_credentials",
+      )?.data?.api_key;
 
-    return openAIKey;
-  } else if (validatedInputs.model_provider === "google_gen_ai") {
-    const googleAIKey = validatedCredentials.find(
-      (credential) => credential.name === "google_ai_credentials",
-    )?.data?.api_key;
+      if (!googleAIKey) {
+        throw new Error("GoogleAI API key required");
+      }
 
-    if (!googleAIKey) {
-      throw new Error("GoogleAI API key required");
+      return googleAIKey;
     }
+    case "anthropic": {
+      const googleAIKey = validatedCredentials.find(
+        (credential) => credential.name === "anthropic_credentials",
+      )?.data?.api_key;
 
-    return googleAIKey;
+      if (!googleAIKey) {
+        throw new Error("Anthropic API key required");
+      }
+
+      return googleAIKey;
+    }
+    default:
+      throw new Error(
+        `API key required to use ${validatedInputs.model_provider}`,
+      );
   }
-
-  throw new Error(`API key required to use ${validatedInputs.model_provider}`);
 };
 
 /**
@@ -285,21 +306,36 @@ export const getAgentModel = (
   validatedInputs: z.infer<typeof inputSchema>,
   apiKey?: string,
 ): string | Model | undefined => {
-  if (validatedInputs.model_provider === "openai") {
-    return validatedInputs.openai_model_settings?.model;
-  } else if (validatedInputs.model_provider === "google_gen_ai") {
-    const google = createGoogleGenerativeAI({
-      apiKey,
-    });
-    return aisdk(
-      google(
-        validatedInputs.google_gen_ai_model_settings
-          ?.model as GoogleGenerativeAIModelId,
-      ),
-    );
+  switch (validatedInputs.model_provider) {
+    case "openai":
+      return validatedInputs.openai_model_settings?.model;
+    case "google_gen_ai": {
+      const google = createGoogleGenerativeAI({
+        apiKey,
+      });
+      return aisdk(
+        google(
+          validatedInputs.google_gen_ai_model_settings
+            ?.model as GoogleGenerativeAIModelId,
+        ),
+      );
+    }
+    case "anthropic": {
+      const anthropic = createAnthropic({
+        apiKey,
+      });
+      return aisdk(
+        anthropic(
+          validatedInputs.anthropic_model_settings
+            ?.model as AnthropicMessagesModelId,
+        ),
+      );
+    }
+    default:
+      throw new Error(
+        `Unsupported model provider: ${validatedInputs.model_provider}`,
+      );
   }
-
-  throw new Error(`No valid model found for ${validatedInputs.model_provider}`);
 };
 
 /**

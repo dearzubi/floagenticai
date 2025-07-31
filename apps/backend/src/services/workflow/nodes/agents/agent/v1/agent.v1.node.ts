@@ -3,7 +3,6 @@ import type {
   NodeExecutionInput,
   NodeExecutionOutput,
 } from "../../../types.js";
-import { modelProviders } from "../model-providers/index.js";
 import { NodeVersionDescription } from "common";
 import {
   NodeProperty,
@@ -36,6 +35,7 @@ import {
   validateNodeExecutionSchema,
 } from "../../../utils.js";
 import { GENERIC_AGENT_INSTRUCTIONS } from "./constants.js";
+import { modelProviderNodeProperties } from "./model/node-properties/index.js";
 
 export class AgentV1Node implements INodeVersion {
   description: NodeVersionDescription;
@@ -49,16 +49,16 @@ export class AgentV1Node implements INodeVersion {
           name: "model_provider",
           label: "Model Provider",
           type: "options",
-          options: modelProviders.map((provider) => {
+          options: modelProviderNodeProperties.map((provider) => {
             return {
               name: provider.name,
               label: provider.label,
               icon: provider.icon,
             } satisfies NodePropertyOption;
           }),
-          default: modelProviders[0]?.name,
+          default: modelProviderNodeProperties[0]?.name,
         },
-        ...modelProviders.map((provider) => {
+        ...modelProviderNodeProperties.map((provider) => {
           return {
             label: `${provider.label} Model Settings`,
             name: `${provider.name}_model_settings`,

@@ -3,7 +3,6 @@ import type {
   NodeExecutionInput,
   NodeExecutionOutput,
 } from "../../../types.js";
-import { modelProviders } from "../../agent/model-providers/index.js";
 import { NodeVersionDescription } from "common";
 import {
   NodeProperty,
@@ -44,6 +43,7 @@ import { supportedNetworks } from "../../../../../blockchain/platform/oneinch/co
 import { SupportedNetworks } from "../../../../../blockchain/platform/oneinch/types.js";
 import { WalletTypes } from "../../../../../blockchain/wallet/types.js";
 import { getSelectedOneInchTools } from "./utils.js";
+import { modelProviderNodeProperties } from "../../agent/v1/model/node-properties/index.js";
 
 export class OneInchAgentV1Node implements INodeVersion {
   description: NodeVersionDescription;
@@ -62,16 +62,16 @@ export class OneInchAgentV1Node implements INodeVersion {
           name: "model_provider",
           label: "Model Provider",
           type: "options",
-          options: modelProviders.map((provider) => {
+          options: modelProviderNodeProperties.map((provider) => {
             return {
               name: provider.name,
               label: provider.label,
               icon: provider.icon,
             } satisfies NodePropertyOption;
           }),
-          default: modelProviders[0]?.name,
+          default: modelProviderNodeProperties[0]?.name,
         },
-        ...modelProviders.map((provider) => {
+        ...modelProviderNodeProperties.map((provider) => {
           return {
             label: `${provider.label} Model Settings`,
             name: `${provider.name}_model_settings`,
