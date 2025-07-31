@@ -1,8 +1,8 @@
 import { z } from "zod/v4";
-import { NodeExecutionError } from "../../../../utils/errors/node-execution.error.js";
+import { NodeExecutionError } from "../../../utils/errors/node-execution.error.js";
 import { NodeErrorExecutionOutput, NodeExecutionOutput } from "./types.js";
-import { logger } from "../../../../utils/logger/index.js";
-import { publishWorkflowNodeExecutionEvent } from "../../execution-engine/utils.js";
+import { logger } from "../../../utils/logger/index.js";
+import { publishWorkflowNodeExecutionEvent } from "../execution-engine/utils.js";
 import { TriggerNodeNames } from "common";
 
 /**

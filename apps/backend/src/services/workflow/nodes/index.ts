@@ -3,7 +3,7 @@ import { IBaseNode } from "./types.js";
 import { AgentNode } from "./agents/agent/agent.node.js";
 import { RouterAgentNode } from "./agents/router-agent/router-agent.node.js";
 import { ManualTriggerNode } from "./triggers/manual/manual.trigger.node.js";
-import { logger } from "../../../../utils/logger/index.js";
+import { logger } from "../../../utils/logger/index.js";
 import { ChatTriggerNode } from "./triggers/chat/chat.trigger.node.js";
 import { OneInchAgentNode } from "./agents/one-inch-agent/one-inch-agent.node.js";
 

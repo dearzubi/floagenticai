@@ -17,11 +17,11 @@ import {
   WorkflowOrchestratorTaskOutputs,
 } from "./types.js";
 import { logger } from "../../../utils/logger/index.js";
-import { NodeExecutionOutput } from "../builder/nodes/types.js";
+import { NodeExecutionOutput } from "../nodes/types.js";
 import { getRedisClient } from "../../../lib/redis/index.js";
 import { WorkflowExecutionError } from "../../../utils/errors/workflow-execution.error.js";
 import { getCredentialListByIds } from "../../credentials/crud/index.js";
-import { OutputsShape as RouterAgentOutputsShape } from "../builder/nodes/agents/router-agent/v1/schemas.js";
+import { OutputsShape as RouterAgentOutputsShape } from "../nodes/agents/router-agent/v1/schemas.js";
 
 /**
  * Generates a map of node IDs to their dependencies (node IDs that are required to be executed before it).

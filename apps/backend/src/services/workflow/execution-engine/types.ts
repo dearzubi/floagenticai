@@ -5,7 +5,7 @@ import {
   TriggerNodeNames,
 } from "common";
 import { JsonObject } from "@hatchet-dev/typescript-sdk";
-import { NodeExecutionOutput } from "../builder/nodes/types.js";
+import { NodeExecutionOutput } from "../nodes/types.js";
 
 export type WorkflowOrchestratorTaskInputs = {
   userId?: string;

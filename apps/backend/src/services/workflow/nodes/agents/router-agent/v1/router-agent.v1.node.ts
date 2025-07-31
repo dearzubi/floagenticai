@@ -34,7 +34,7 @@ import {
   getAgentContextToForwardString,
   getSelectedCondition,
 } from "./utils.js";
-import { publishWorkflowNodeExecutionEvent } from "../../../../../execution-engine/utils.js";
+import { publishWorkflowNodeExecutionEvent } from "../../../../execution-engine/utils.js";
 
 export class RouterAgentV1Node implements INodeVersion {
   description: NodeVersionDescription;

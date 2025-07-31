@@ -1,8 +1,8 @@
 import { RunContext, Tool, tool } from "@openai/agents";
 import { name, description, argsSchema } from "./info.js";
 import { OneInchToolsContext } from "../types.js";
-import { logger } from "../../../../../../../../../utils/logger/index.js";
-import { OneInchService } from "../../../../../../../../blockchain/platform/oneinch/index.js";
+import { logger } from "../../../../../../../../utils/logger/index.js";
+import { OneInchService } from "../../../../../../../blockchain/platform/oneinch/index.js";
 import { privateKeyToAccount } from "viem/accounts";
 import { Hex } from "viem";
 

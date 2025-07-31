@@ -15,13 +15,13 @@ import {
 } from "@openai/agents";
 import { credentialsSchema, inputSchema, OutputsShape } from "./schemas.js";
 import { OutputsShape as RouterAgentOutputsShape } from "../../router-agent/v1/schemas.js";
-import { getDB } from "../../../../../../../database/init.js";
-import { AgentMemory } from "../../../../../../../database/entities/agent-memory.entity.js";
-import { safeParseJSON } from "../../../../../../../utils/misc.js";
+import { getDB } from "../../../../../../database/init.js";
+import { AgentMemory } from "../../../../../../database/entities/agent-memory.entity.js";
+import { safeParseJSON } from "../../../../../../utils/misc.js";
 import {
   decryptData,
   encryptData,
-} from "../../../../../../../utils/encryption.js";
+} from "../../../../../../utils/encryption.js";
 import { z } from "zod/v4";
 import { z as zodv3, ZodTypeAny } from "zod";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";

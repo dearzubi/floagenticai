@@ -35,14 +35,14 @@ import {
   handleNodeExecutionError,
   validateNodeExecutionSchema,
 } from "../../../utils.js";
-import { publishWorkflowNodeExecutionEvent } from "../../../../../execution-engine/utils.js";
+import { publishWorkflowNodeExecutionEvent } from "../../../../execution-engine/utils.js";
 import { ToolNames } from "./types.js";
 import { GENERIC_AGENT_INSTRUCTIONS } from "../../agent/v1/constants.js";
 import { toolOptions } from "./tools/index.js";
 import { OneInchToolsContext } from "./tools/types.js";
-import { supportedNetworks } from "../../../../../../blockchain/platform/oneinch/constants.js";
-import { SupportedNetworks } from "../../../../../../blockchain/platform/oneinch/types.js";
-import { WalletTypes } from "../../../../../../blockchain/wallet/types.js";
+import { supportedNetworks } from "../../../../../blockchain/platform/oneinch/constants.js";
+import { SupportedNetworks } from "../../../../../blockchain/platform/oneinch/types.js";
+import { WalletTypes } from "../../../../../blockchain/wallet/types.js";
 import { getSelectedOneInchTools } from "./utils.js";
 
 export class OneInchAgentV1Node implements INodeVersion {

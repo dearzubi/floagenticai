@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { ToolNames } from "../../types.js";
-import { supportedNetworks } from "../../../../../../../../blockchain/platform/oneinch/constants.js";
-import { SupportedNetworks } from "../../../../../../../../blockchain/platform/oneinch/types.js";
+import { supportedNetworks } from "../../../../../../../blockchain/platform/oneinch/constants.js";
+import { SupportedNetworks } from "../../../../../../../blockchain/platform/oneinch/types.js";
 
 const networksList = Array.from(supportedNetworks.keys());
 

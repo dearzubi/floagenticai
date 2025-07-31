@@ -2,14 +2,14 @@ import { RunContext, Tool, tool } from "@openai/agents";
 import { name, description, argsSchema } from "./info.js";
 import { Hex } from "viem";
 import { OneInchToolsContext } from "../types.js";
-import { logger } from "../../../../../../../../../utils/logger/index.js";
+import { logger } from "../../../../../../../../utils/logger/index.js";
 import { privateKeyToAccount } from "viem/accounts";
-import { OneInchService } from "../../../../../../../../blockchain/platform/oneinch/index.js";
+import { OneInchService } from "../../../../../../../blockchain/platform/oneinch/index.js";
 
 /**
- * Tool for the agent to do token swap using 1Inch API.
+ * Tool for the agent get all limit orders for an address using 1Inch.
  */
-export const oneInchSwapTool = (
+export const oneInchGetAllLimitOrdersTool = (
   needsApproval?: boolean,
 ): Tool<OneInchToolsContext> => {
   return tool({
@@ -17,10 +17,7 @@ export const oneInchSwapTool = (
     description: description,
     parameters: argsSchema,
     needsApproval,
-    async execute(
-      { sellToken, buyToken, amount, network, slippagePercentage },
-      ctx?: RunContext<OneInchToolsContext>,
-    ) {
+    async execute({ network, status }, ctx?: RunContext<OneInchToolsContext>) {
       if (!ctx?.context?.evmPrivateKey) {
         throw new Error("Private key is required to sign swap transaction");
       }
@@ -28,14 +25,12 @@ export const oneInchSwapTool = (
       const account = privateKeyToAccount(ctx?.context.evmPrivateKey as Hex);
 
       logger.debug(
-        `Executing 1Inch swap with parameters: ${JSON.stringify({
-          sellToken,
-          buyToken,
-          amount,
-          network,
-          slippagePercentage,
-          account: account.address,
-        })}`,
+        `Executing 1Inch get all limit orders with parameters: ${JSON.stringify(
+          {
+            account: account.address,
+            network,
+          },
+        )}`,
       );
 
       const oneInchService = await OneInchService.init({
@@ -46,34 +41,26 @@ export const oneInchSwapTool = (
         rpcProvider: ctx?.context?.rpcProvider,
       });
 
-      const txLink = await oneInchService.swap.swapTokens({
-        sellToken,
-        buyToken,
-        amount,
-        slippagePercentage,
-      });
+      const orders = await oneInchService.limitOrders.getAllLimitOrders(status);
 
-      return `Swap successfully completed.\n\n ${JSON.stringify(
+      return JSON.stringify(
         {
-          sellToken,
-          buyToken,
-          amount,
+          orders,
           network,
-          tx: txLink,
         },
         null,
         2,
-      )}`;
+      );
     },
     errorFunction: (_ctx, error) => {
-      logger.error(`1Inch swap failed: `, { error });
+      logger.error(`1Inch get all limit orders failed: `, { error });
       return JSON.stringify(
         {
           message:
             error instanceof Error
               ? error.message
-              : "Failed to swap tokens with 1Inch.",
-          code: "1INCH_SWAP_ERROR",
+              : "Failed to get all limit orders from 1Inch.",
+          code: "1INCH_LIMIT_ORDER_ERROR",
         },
         null,
         2,

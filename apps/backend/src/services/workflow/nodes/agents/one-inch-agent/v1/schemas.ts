@@ -2,13 +2,13 @@ import { z } from "zod/v4";
 import { z as zodv3 } from "zod";
 import { inputSchema as agentInputSchema } from "../../agent/v1/schemas.js";
 import { toolNames } from "./constants.js";
-import { openAICredentialsSchema } from "../../../../../../credentials/credentials/openai-credentials/schemas.js";
-import { googleAICredentialsSchema } from "../../../../../../credentials/credentials/googleai-credentials/schemas.js";
-import { evmPrivateKeyCredentialsSchema } from "../../../../../../credentials/credentials/evm-pk-credentials/schemas.js";
-import { rpcCredentialsSchema } from "../../../../../../credentials/credentials/rpc-credentials/schemas.js";
-import { oneInchAICredentialsSchema } from "../../../../../../credentials/credentials/oneinch-credentials/schemas.js";
-import { supportedNetworks } from "../../../../../../blockchain/platform/oneinch/constants.js";
-import { walletTypes } from "../../../../../../blockchain/wallet/constants.js";
+import { openAICredentialsSchema } from "../../../../../credentials/credentials/openai-credentials/schemas.js";
+import { googleAICredentialsSchema } from "../../../../../credentials/credentials/googleai-credentials/schemas.js";
+import { evmPrivateKeyCredentialsSchema } from "../../../../../credentials/credentials/evm-pk-credentials/schemas.js";
+import { rpcCredentialsSchema } from "../../../../../credentials/credentials/rpc-credentials/schemas.js";
+import { oneInchAICredentialsSchema } from "../../../../../credentials/credentials/oneinch-credentials/schemas.js";
+import { supportedNetworks } from "../../../../../blockchain/platform/oneinch/constants.js";
+import { walletTypes } from "../../../../../blockchain/wallet/constants.js";
 
 const toolSchema = z
   .array(z.enum(Array.from(toolNames.keys())))

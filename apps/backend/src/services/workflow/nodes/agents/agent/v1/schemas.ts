@@ -1,8 +1,8 @@
 import { z } from "zod/v4";
 import { modelProviders } from "../model-providers/index.js";
 import { ModelProvider } from "../model-providers/types.js";
-import { openAICredentialsSchema } from "../../../../../../credentials/credentials/openai-credentials/schemas.js";
-import { googleAICredentialsSchema } from "../../../../../../credentials/credentials/googleai-credentials/schemas.js";
+import { openAICredentialsSchema } from "../../../../../credentials/credentials/openai-credentials/schemas.js";
+import { googleAICredentialsSchema } from "../../../../../credentials/credentials/googleai-credentials/schemas.js";
 import { AgentArtifacts } from "common";
 
 const openAIProvider = modelProviders.find(

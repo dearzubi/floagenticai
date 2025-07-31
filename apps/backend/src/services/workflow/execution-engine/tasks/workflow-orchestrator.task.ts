@@ -17,7 +17,7 @@ import {
   publishWorkflowNodeExecutionEvent,
   resolveInputReferences,
 } from "../utils.js";
-import { NodeExecutionOutput } from "../../builder/nodes/types.js";
+import { NodeExecutionOutput } from "../../nodes/types.js";
 import {
   AgentArtifacts,
   AgentToolApprovalItem,
@@ -26,13 +26,13 @@ import {
   WorkflowBuilderUINodeData,
 } from "common";
 import { JsonObject } from "@hatchet-dev/typescript-sdk/v1/types.js";
-import { workflowNodes } from "../../builder/nodes/index.js";
-import { handleNodeExecutionError } from "../../builder/nodes/utils.js";
+import { workflowNodes } from "../../nodes/index.js";
+import { handleNodeExecutionError } from "../../nodes/utils.js";
 import { decryptData } from "../../../../utils/encryption.js";
 import { safeParseJSON } from "../../../../utils/misc.js";
-import { OutputsShape as AgentOutputsShape } from "../../builder/nodes/agents/agent/v1/schemas.js";
+import { OutputsShape as AgentOutputsShape } from "../../nodes/agents/agent/v1/schemas.js";
 import { logger } from "../../../../utils/logger/index.js";
-import { OutputsShape as RouterAgentOutputsShape } from "../../builder/nodes/agents/router-agent/v1/schemas.js";
+import { OutputsShape as RouterAgentOutputsShape } from "../../nodes/agents/router-agent/v1/schemas.js";
 import { createChatMessage } from "../../../chat/crud/index.js";
 import {
   ChatSenderRole,

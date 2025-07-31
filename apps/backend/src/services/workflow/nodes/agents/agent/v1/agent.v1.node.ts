@@ -30,7 +30,7 @@ import {
   isStreamingEnabled,
   updateAgentMemory,
 } from "./utils.js";
-import { publishWorkflowNodeExecutionEvent } from "../../../../../execution-engine/utils.js";
+import { publishWorkflowNodeExecutionEvent } from "../../../../execution-engine/utils.js";
 import {
   handleNodeExecutionError,
   validateNodeExecutionSchema,
