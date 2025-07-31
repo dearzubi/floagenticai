@@ -1,0 +1,21 @@
+export type FormattedLimitOrder = {
+  walletAddress: string;
+  orderHash: string;
+  createDateTime: string;
+  lastChangedDateTime?: string;
+  expiryDateTime: string;
+  sellToken: string;
+  sellTokenAddress: string;
+  buyToken: string;
+  buyTokenAddress: string;
+  sellAmount: string;
+  remainingSellAmount: string;
+  buyAmount: string;
+  status?: string;
+  orderInvalidReason?: string[] | null;
+  pricePerSellToken: string;
+  pricePerBuyToken: string;
+  network: string;
+  // expiryDateTime: string;
+  // remainingTime: string;
+};

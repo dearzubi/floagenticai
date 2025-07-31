@@ -1,0 +1,11 @@
+.turbo/
+node_modules/
+.idea/
+.env
+CLAUDE.md
+GEMINI.md
+.gemini/
+.claude/
+.trae/
+.vscode/
+.zed/

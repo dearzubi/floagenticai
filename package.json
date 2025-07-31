@@ -1,0 +1,37 @@
+{
+  "name": "floagenticai",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev --parallel",
+    "clean": "pnpm --filter \"./apps/**\" --filter \"./packages/**\" clean && rimraf node_modules .turbo tsconfig.tsbuildinfo",
+    "nuke": "pnpm --filter \"./apps/**\" --filter \"./packages/**\" nuke && rimraf node_modules .turbo tsconfig.tsbuildinfo",
+    "lint": "pnpm --filter \"./apps/**\" --filter \"./packages/**\" lint",
+    "lint:fix": "pnpm --filter \"./apps/**\" --filter \"./packages/**\" lint:fix",
+    "check-types": "pnpm --filter \"./apps/**\" --filter \"./packages/**\" check-types",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "release": "release-it",
+    "prepare": "node .husky/install.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@release-it/conventional-changelog": "^10.0.1",
+    "conventional-changelog-conventionalcommits": "^8.0.0",
+    "husky": "^9.1.7",
+    "prettier": "3.5.3",
+    "release-it": "^19.0.1",
+    "rimraf": "^6.0.1",
+    "tsx": "^4.7.0",
+    "turbo": "^2.5.4"
+  },
+  "packageManager": "pnpm@9.12.3",
+  "resolutions": {
+    "conventional-changelog-conventionalcommits": "8.0.0"
+  }
+}

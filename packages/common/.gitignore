@@ -1,0 +1,6 @@
+tsconfig.tsbuildinfo
+dist/
+.env
+tmp/
+temp/
+logs/

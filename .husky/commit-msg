@@ -1,0 +1,15 @@
+#!/bin/sh
+
+if head -1 "$1" | grep -qE "^Merge "; then
+  exit
+fi
+
+if ! head -1 "$1" | grep -qE "^(feat|feat!|fix|chore|docs|test|style|refactor|perf|build|ci|revert)(\(.+?\))?: .{1,}$"; then
+    printf "Aborting commit. Your commit message needs to follow conventional commits. Learn: https://cheatsheets.zip/conventional-commits" >&2
+    exit 1
+fi
+
+#if ! head -1 "$1" | grep -qE "^.{1,88}$"; then
+#    printf "Aborting commit. Your commit message is too long. Max allowed 88 characters." >&2
+#    exit 1
+#fi
