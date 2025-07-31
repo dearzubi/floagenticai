@@ -9,6 +9,7 @@ import { rpcCredentialsSchema } from "../../../../../credentials/credentials/rpc
 import { oneInchAICredentialsSchema } from "../../../../../credentials/credentials/oneinch-credentials/schemas.js";
 import { supportedNetworks } from "../../../../../blockchain/platform/oneinch/constants.js";
 import { walletTypes } from "../../../../../blockchain/wallet/constants.js";
+import { anthropicCredentialsSchema } from "../../../../../credentials/credentials/anthropic-credentials/schemas.js";
 
 const toolSchema = z
   .array(z.enum(Array.from(toolNames.keys())))
@@ -20,6 +21,7 @@ export const inputSchema = agentInputSchema
     model_provider: true,
     openai_model_settings: true,
     google_gen_ai_model_settings: true,
+    anthropic_model_settings: true,
     instructions: true,
     enable_memory: true,
   })
@@ -45,6 +47,7 @@ export const credentialsSchema = z
       evmPrivateKeyCredentialsSchema,
       rpcCredentialsSchema,
       oneInchAICredentialsSchema,
+      anthropicCredentialsSchema,
     ]),
   )
   .nonempty({ error: "Missing model or other required credentials." });

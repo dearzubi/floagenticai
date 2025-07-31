@@ -261,7 +261,8 @@ export class OneInchAgentV1Node implements INodeVersion {
         validatedCredentials.filter(
           (c) =>
             c.name === "open_ai_credentials" ||
-            c.name === "google_ai_credentials",
+            c.name === "google_ai_credentials" ||
+            c.name === "anthropic_credentials",
         ),
       );
 
