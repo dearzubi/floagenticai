@@ -27,6 +27,9 @@ import { z as zodv3, ZodTypeAny } from "zod";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { aisdk } from "@openai/agents-extensions";
 import { createAnthropic } from "@ai-sdk/anthropic";
+import { createOpenAI } from "@ai-sdk/openai";
+
+type OpenAIChatModelId = Parameters<ReturnType<typeof createOpenAI>>["0"];
 
 type GoogleGenerativeAIModelId = Parameters<
   ReturnType<typeof createGoogleGenerativeAI>
@@ -307,8 +310,18 @@ export const getAgentModel = (
   apiKey?: string,
 ): string | Model | undefined => {
   switch (validatedInputs.model_provider) {
-    case "openai":
-      return validatedInputs.openai_model_settings?.model;
+    case "openai": {
+      const openai = createOpenAI({
+        apiKey,
+        compatibility: "strict", // strict mode, enable when using the OpenAI API
+      });
+
+      return aisdk(
+        openai(
+          validatedInputs.openai_model_settings?.model as OpenAIChatModelId,
+        ),
+      );
+    }
     case "google_gen_ai": {
       const google = createGoogleGenerativeAI({
         apiKey,
