@@ -1,5 +1,5 @@
-import { FC, PropsWithChildren } from "react";
-import { Handle, Position } from "@xyflow/react";
+import { FC, PropsWithChildren, useEffect } from "react";
+import { Handle, Position, useUpdateNodeInternals } from "@xyflow/react";
 import { Icon } from "@iconify/react";
 import { WorkflowBuilderUINodeData } from "common";
 import { Tooltip } from "@heroui/react";
@@ -14,6 +14,8 @@ const RouterConnectors: FC<RouterConnectorsProps> = ({
   color,
   nodeData,
 }) => {
+  const updateNodeInternals = useUpdateNodeInternals();
+
   // Get conditions from the current version's inputs
   const currentVersion = nodeData.versions.find(
     (v) => v.version === nodeData.currentVersion,
@@ -42,6 +44,10 @@ const RouterConnectors: FC<RouterConnectorsProps> = ({
   const getHandlePosition = (index: number, total: number) => {
     return ((index + 1) * 100) / (total + 1);
   };
+
+  useEffect(() => {
+    updateNodeInternals(nodeData.id);
+  }, [conditions]);
 
   return (
     <div className={"flex"}>
