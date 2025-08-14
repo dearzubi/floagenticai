@@ -4,6 +4,7 @@ import { initAnthropicChatModel } from "./anthropic.provider.js";
 import { initOpenAIChatModel } from "./openai.provider.js";
 import { initGoogleChatModel } from "./google.provider.js";
 import { ModelProviders } from "common";
+import { initDeepSeekChatModel } from "./deepseek.provider.js";
 
 export const chatModelFactories = new Map<
   ModelProviders,
@@ -11,4 +12,5 @@ export const chatModelFactories = new Map<
 >()
   .set("anthropic", initAnthropicChatModel)
   .set("openai", initOpenAIChatModel)
-  .set("google_gen_ai", initGoogleChatModel);
+  .set("google_gen_ai", initGoogleChatModel)
+  .set("deepseek", initDeepSeekChatModel);

@@ -5,11 +5,13 @@ import { EVMPrivateKeyCredentials } from "./evm-pk-credentials/evm-pk.credential
 import { RPCCredentials } from "./rpc-credentials/rpc.credentials.js";
 import { OneInchCredentials } from "./oneinch-credentials/oneinch.credentials.js";
 import { AnthropicCredentials } from "./anthropic-credentials/anthropic.credentials.js";
+import { DeepseekCredentials } from "./deepseek-credentials/deepseek.credentials.js";
 
 export const nodeCredentials: Record<NodeCredentialNames, INodeCredential> = {
   openai: new OpenAICredentials(),
   google_gen_ai: new GoogleAICredentials(),
   anthropic: new AnthropicCredentials(),
+  deepseek: new DeepseekCredentials(),
   evm_pk_credentials: new EVMPrivateKeyCredentials(),
   rpc_credentials: new RPCCredentials(),
   oneinch_credentials: new OneInchCredentials(),

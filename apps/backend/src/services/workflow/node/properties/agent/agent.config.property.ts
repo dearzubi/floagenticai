@@ -7,6 +7,7 @@ import { z } from "zod/v4";
 import { openAIProviderPropertiesSchema } from "./provider/openai.properties.js";
 import { googleGenAIProviderPropertiesSchema } from "./provider/google.genai.properties.js";
 import { anthropicProviderPropertiesSchema } from "./provider/anthropic.properties.js";
+import { deepseekProviderPropertiesSchema } from "./provider/deepseek.properties.js";
 
 /**
  * Agent configurations node property for workflow nodes.
@@ -149,6 +150,7 @@ const agentConfigurationsPropertyInputSchema = z.object({
       ...openAIProviderPropertiesSchema.shape,
       ...googleGenAIProviderPropertiesSchema.shape,
       ...anthropicProviderPropertiesSchema.shape,
+      ...deepseekProviderPropertiesSchema.shape,
     }),
 });
 
