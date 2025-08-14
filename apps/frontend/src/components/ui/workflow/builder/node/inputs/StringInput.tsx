@@ -48,6 +48,7 @@ const StringInput: FC<{
           classNames={{
             clearButton:
               "!bg-transparent !text-gray-500 hover:!text-gray-700 border-none focus:outline-none transition-colors",
+            input: "focus:outline-none focus:ring-0 focus:ring-offset-0",
           }}
         />
       ) : (
@@ -72,6 +73,7 @@ const StringInput: FC<{
               "!bg-transparent !text-gray-500 hover:!text-gray-700 border-none focus:outline-none transition-colors",
             innerWrapper:
               "focus-within:!outline-none focus-within:!ring-transparent focus-within:!ring-offset-0",
+            input: "focus:outline-none focus:ring-0 focus:ring-offset-0",
           }}
         />
       )}

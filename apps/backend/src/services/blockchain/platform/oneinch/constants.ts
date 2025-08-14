@@ -11,3 +11,5 @@ export const supportedNetworks = new Map<SupportedNetworks, string>([
   ["bsc", "BNB Smart Chain"],
   ["gnosis", "Gnosis Chain"],
 ]);
+
+export const networksList = Array.from(supportedNetworks.keys());

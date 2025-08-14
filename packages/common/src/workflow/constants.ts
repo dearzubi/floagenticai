@@ -24,4 +24,5 @@ export const nodePropertyTypes = [
   "array",
   "propertyCollection",
   "credential",
+  "section",
 ] as const;

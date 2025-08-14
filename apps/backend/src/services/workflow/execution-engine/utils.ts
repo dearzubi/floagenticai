@@ -2,7 +2,6 @@ import type { Edge, Node, ReactFlowJsonObject } from "@xyflow/react";
 import {
   extractNodeNameFromNodeId,
   getWorkflowPubSubChannelName,
-  NodeCredentialNames,
   TriggerNodeNames,
   WorkflowBuilderUINodeData,
   WorkflowNodeExecutionEvent,
@@ -11,17 +10,19 @@ import { safeParseJSON } from "../../../utils/misc.js";
 import { workflowSerialisedReactFlowSchema } from "../../../api/v1/schemas/workflow.schemas.js";
 import { JsonObject } from "@hatchet-dev/typescript-sdk";
 import {
-  CredentialData,
   JsonObjectPath,
   JsonPathValue,
   WorkflowOrchestratorTaskOutputs,
 } from "./types.js";
 import { logger } from "../../../utils/logger/index.js";
-import { NodeExecutionOutput } from "../nodes/types.js";
+import { NodeExecutionInput, NodeExecutionOutput } from "../node/types.js";
 import { getRedisClient } from "../../../lib/redis/index.js";
 import { WorkflowExecutionError } from "../../../utils/errors/workflow-execution.error.js";
 import { getCredentialListByIds } from "../../credentials/crud/index.js";
-import { OutputsShape as RouterAgentOutputsShape } from "../nodes/agents/router-agent/v1/schemas.js";
+import { AgentInputItem } from "@openai/agents";
+import { AgentOutputs } from "../../ai/agent/types.js";
+import { CredentialData } from "../../credentials/crud/types.js";
+import { RouterAgentOutputStructure } from "../node/nodes/agents/router-agent/v1/schemas.js";
 
 /**
  * Generates a map of node IDs to their dependencies (node IDs that are required to be executed before it).
@@ -38,6 +39,7 @@ export const generateNodesDependencyMap = (
   edges: Edge[],
 ): Map<string, string[]> => {
   const dependencyMap = new Map<string, string[]>();
+  let hasTriggerNode = false;
 
   nodes.forEach((node) => {
     if (
@@ -47,14 +49,17 @@ export const generateNodesDependencyMap = (
       return;
     }
     dependencyMap.set(node.id, []);
+
+    if (
+      node.data.trigger &&
+      node.data.name === triggerName &&
+      !hasTriggerNode
+    ) {
+      hasTriggerNode = true;
+    }
   });
 
-  const triggerNodes = Array.from(dependencyMap.keys()).filter((nodeId) => {
-    const node = nodes.find((n) => n.id === nodeId);
-    return node?.data.trigger && node.data.name === triggerName;
-  });
-
-  if (triggerNodes.length === 0) {
+  if (!hasTriggerNode) {
     throw new Error(
       `Workflow must have at least one active trigger node for "${triggerName}"`,
     );
@@ -64,47 +69,61 @@ export const generateNodesDependencyMap = (
     const targetId = edge.target;
     const sourceId = edge.source;
 
-    if (dependencyMap.has(targetId) && dependencyMap.has(sourceId)) {
-      const currentDeps = dependencyMap.get(targetId) || [];
-      if (!currentDeps.includes(sourceId)) {
-        dependencyMap.set(targetId, [...currentDeps, sourceId]);
-      }
+    if (!dependencyMap.has(targetId) || !dependencyMap.has(sourceId)) {
+      return;
     }
+
+    const currentDeps = dependencyMap.get(targetId) || [];
+
+    if (currentDeps.includes(sourceId)) {
+      return;
+    }
+
+    dependencyMap.set(targetId, [...currentDeps, sourceId]);
   });
 
   let hasChanges = false;
 
+  const nodeMap = new Map(nodes.map((node) => [node.id, node]));
+
   do {
     hasChanges = false;
-    const nodesToRemove: string[] = [];
+    const orphanedNodeIds: string[] = [];
 
     dependencyMap.forEach((dependencies, nodeId) => {
-      const node = nodes.find((n) => n.id === nodeId);
+      const node = nodeMap.get(nodeId);
 
       // If it's not a trigger node and has no dependencies, it's orphaned
       if (!node || (!node.data.trigger && dependencies.length === 0)) {
-        nodesToRemove.push(nodeId);
+        orphanedNodeIds.push(nodeId);
       }
     });
 
-    if (nodesToRemove.length > 0) {
-      hasChanges = true;
-
-      // Remove orphaned nodes
-      nodesToRemove.forEach((nodeId) => {
-        dependencyMap.delete(nodeId);
-      });
-
-      // Remove invalid dependency references left after orphaned nodes removal
-      dependencyMap.forEach((nodeDependencies, nodeId) => {
-        const validDeps = nodeDependencies.filter((depId) =>
-          dependencyMap.has(depId),
-        );
-        if (validDeps.length < nodeDependencies.length) {
-          dependencyMap.set(nodeId, validDeps);
-        }
-      });
+    if (orphanedNodeIds.length === 0) {
+      break;
     }
+
+    hasChanges = true;
+
+    orphanedNodeIds.forEach((nodeId) => {
+      dependencyMap.delete(nodeId);
+    });
+
+    // Remove invalid dependency references left after orphaned nodes removal
+    dependencyMap.forEach((nodeDependencies, nodeId) => {
+      if (nodeDependencies.length === 0) {
+        return;
+      }
+
+      const validDeps = nodeDependencies.filter((depId) =>
+        dependencyMap.has(depId),
+      );
+
+      if (validDeps.length === nodeDependencies.length) {
+        return;
+      }
+      dependencyMap.set(nodeId, validDeps);
+    });
   } while (hasChanges);
 
   if (dependencyMap.size === 0) {
@@ -115,18 +134,18 @@ export const generateNodesDependencyMap = (
 };
 
 /**
- * Gets the workflow from the database, parses and validates the flow data, and returns the nodes and edges.
+ * Parses and validates the workflow flow data, and returns the nodes and edges.
  * @param workflowId - The ID of the workflow
  * @param flowData - The flow data of the workflow
  * @returns An object containing the nodes and edges
  */
-export const parseWorkflow = async (
+export const parseWorkflow = (
   workflowId: string,
   flowData?: string,
-): Promise<{
+): {
   nodes: Node<WorkflowBuilderUINodeData>[];
   edges: ReactFlowJsonObject["edges"];
-}> => {
+} => {
   const serialisedReactFlow = safeParseJSON(
     flowData,
     workflowSerialisedReactFlowSchema,
@@ -166,37 +185,33 @@ const getNodeReferenceValue = <P extends JsonObjectPath>(
 
 const resolveNodeOutputReference = (
   reference: string,
-  processedNodes: Map<string, NodeExecutionOutput>,
+  executedNodesMap: Map<string, NodeExecutionOutput>,
 ): unknown => {
   const parts = reference.trim().split(".");
   if (parts.length < 2) {
-    logger.warn(`Invalid reference format: ${reference}`);
     return null;
   }
 
   const nodeId = parts[0];
-  const processedNode = processedNodes.get(nodeId ?? "-");
+  const nodeOutput = executedNodesMap.get(nodeId ?? "-");
 
-  if (!processedNode) {
-    logger.warn(`Referenced node not found: ${nodeId}`);
+  if (!nodeOutput) {
     return null;
   }
 
-  if (!processedNode.success) {
-    logger.warn(`Referenced node failed: ${nodeId}`);
+  if (!nodeOutput.success) {
     return null;
   }
 
-  // Extract the path after the nodeId (skip first part which is nodeId)
   const outputPath = parts.slice(1).join(".");
 
   //@ts-expect-error - TODO: fix this typing issue later; for now this will work just fine
-  return getNodeReferenceValue(processedNode.outputs, outputPath);
+  return getNodeReferenceValue(nodeOutput.outputs, outputPath);
 };
 
 export const resolveInputReferences = (
   inputs: JsonObject,
-  processedNodes: Map<string, NodeExecutionOutput>,
+  executedNodesMap: Map<string, NodeExecutionOutput>,
 ): JsonObject => {
   const resolveValue = (value: unknown): unknown => {
     if (typeof value === "string") {
@@ -205,11 +220,10 @@ export const resolveInputReferences = (
         try {
           const resolvedValue = resolveNodeOutputReference(
             reference,
-            processedNodes,
+            executedNodesMap,
           );
 
           if (resolvedValue === null || resolvedValue === undefined) {
-            logger.warn(`Could not resolve reference: ${reference}`);
             return match;
           }
 
@@ -217,7 +231,7 @@ export const resolveInputReferences = (
             ? resolvedValue
             : JSON.stringify(resolvedValue);
         } catch (error) {
-          logger.error(`Error resolving reference ${reference}:`, error);
+          logger.debug(`Error resolving reference ${reference}:`, error);
           return match;
         }
       });
@@ -313,122 +327,173 @@ export const getWorkflowCredentials = async (
     ),
   ];
 
-  return (
-    await getCredentialListByIds(
-      credentials.map((cred) => cred.id),
-      true,
-    )
-  ).map((cred) => ({
-    id: cred.id,
-    name: cred.credentialName as NodeCredentialNames,
-    data: cred.data,
-  }));
+  return (await getCredentialListByIds(
+    credentials.map((cred) => cred.id),
+    true,
+  )) as CredentialData[];
 };
 
 /**
- * Get all the nodes that are ready to be executed (their dependencies are executed)
+ * Get all the nodes that are ready to be executed (their dependencies are valid and nodes are executed)
+ * This also filters out nodes that are not allowed to execute based on router agent conditions in their dependencies.
  * @param remainingNodeIds - Nodes that are yet to be executed
- * @param executedNodeIds - Nodes that have already been executed
+ * @param executedNodesMap - Nodes that have already been executed
+ * @param edges - Workflow edges
  * @param dependencyMap - Map of node ID to node dependencies
  */
-export const getExecutableNodeIds = ({
+export const filterExecutableNodes = ({
   remainingNodeIds,
-  executedNodeIds,
+  executedNodesMap,
+  edges,
   dependencyMap,
 }: {
   remainingNodeIds: Set<string>;
-  executedNodeIds: Set<string>;
+  executedNodesMap: Map<string, NodeExecutionOutput>;
+  edges: Edge[];
   dependencyMap: Map<string, string[]>;
 }): string[] => {
-  const executableNodes: string[] = [];
+  const executableNodeIds: string[] = [];
+  const nodesToRemove = new Set<string>();
 
-  for (const nodeId of remainingNodeIds) {
-    if (executedNodeIds.has(nodeId)) {
-      continue;
-    }
+  const routerEdgesByTarget = new Map<string, Edge[]>();
 
-    const nodeDependencies = dependencyMap.get(nodeId) || [];
-
-    // Node's dependencies are either executed or yet to be executed
-    // If even one of the deps is invalid reference (does not exist), then the node must not be executed
-    // This can happen because of runtime branching e.g. router agent
-    const hasValidDependencies =
-      nodeDependencies.length === 0 ||
-      nodeDependencies.every(
-        (depId) => executedNodeIds.has(depId) || remainingNodeIds.has(depId),
-      );
-
-    if (!hasValidDependencies) {
-      remainingNodeIds.delete(nodeId);
-      continue;
-    }
-
-    const allDependenciesProcessed =
-      nodeDependencies.length === 0 ||
-      nodeDependencies.every((depId) => executedNodeIds.has(depId));
-
-    if (allDependenciesProcessed) {
-      executableNodes.push(nodeId);
+  for (const edge of edges) {
+    if (extractNodeNameFromNodeId(edge.source) === "router_agent") {
+      const targetEdges = routerEdgesByTarget.get(edge.target);
+      if (targetEdges) {
+        targetEdges.push(edge);
+      } else {
+        routerEdgesByTarget.set(edge.target, [edge]);
+      }
     }
   }
 
-  return executableNodes;
+  for (const nodeId of remainingNodeIds) {
+    if (executedNodesMap.has(nodeId)) {
+      continue;
+    }
+
+    // Router Agent Filtering logic
+    const incomingRouterEdges = routerEdgesByTarget.get(nodeId) ?? [];
+
+    if (incomingRouterEdges.length > 0) {
+      let allRoutersDecided = true; // false if any router hasn't executed yet
+      let routerAllowsNode = true; // false if any router fails or doesn't select this node
+
+      for (const edge of incomingRouterEdges) {
+        const routerOutput = executedNodesMap.get(edge.source) as
+          | NodeExecutionOutput<
+              AgentOutputs<unknown, RouterAgentOutputStructure>
+            >
+          | undefined;
+
+        if (!routerOutput) {
+          allRoutersDecided = false;
+          break;
+        }
+
+        if (!routerOutput.success) {
+          routerAllowsNode = false;
+          break;
+        }
+
+        const selected =
+          routerOutput.outputs?.additionalData?.selectedConditionId;
+        if (!edge.sourceHandle || selected !== edge.sourceHandle) {
+          routerAllowsNode = false;
+          break;
+        }
+      }
+
+      if (!allRoutersDecided) {
+        continue;
+      }
+      if (!routerAllowsNode) {
+        nodesToRemove.add(nodeId);
+        continue;
+      }
+    }
+
+    if (nodesToRemove.has(nodeId)) {
+      continue;
+    }
+
+    const deps = dependencyMap.get(nodeId) ?? [];
+    if (deps.length === 0) {
+      executableNodeIds.push(nodeId);
+      continue;
+    }
+
+    let canExecute = true;
+    for (const depId of deps) {
+      const depOutput = executedNodesMap.get(depId);
+
+      if (!depOutput) {
+        if (!remainingNodeIds.has(depId)) {
+          nodesToRemove.add(nodeId); // invalid dep
+        }
+        canExecute = false; // either pending or invalid
+        break;
+      }
+
+      if (!depOutput.success) {
+        nodesToRemove.add(nodeId);
+        canExecute = false;
+        break;
+      }
+    }
+
+    if (canExecute) {
+      executableNodeIds.push(nodeId);
+    }
+  }
+
+  for (const id of nodesToRemove) {
+    remainingNodeIds.delete(id);
+  }
+
+  return executableNodeIds;
 };
 
 /**
- * Filter executable nodes based on router agent conditions
- * Removes nodes that shouldn't execute based on router agent decisions
- * @param executableNodeIds - Initially executable nodes
- * @param remainingNodeIds - Nodes that are yet to be executed
- * @param executedNodesMap - Map of executed nodes and their outputs
- * @param edges - Workflow edges
+ * Extract context information from parent agent nodes outputs
+ * @param parentNodeOutputs - The outputs of the parent agent nodes
  */
-export const filterExecutableNodesForRouterAgent = ({
-  executableNodeIds,
-  executedNodesMap,
-  edges,
-  remainingNodeIds,
-}: {
-  executableNodeIds: string[];
-  executedNodesMap: Map<string, NodeExecutionOutput>;
-  edges: Edge[];
-  remainingNodeIds: Set<string>;
-}): string[] => {
-  return executableNodeIds.filter((nodeId) => {
-    const incomingRouterEdges = edges.filter(
-      (edge) =>
-        edge.target === nodeId &&
-        extractNodeNameFromNodeId(edge.source) === "router_agent",
-    );
+export const getContextFromParentAgentNodes = (
+  parentNodeOutputs: NodeExecutionInput["parentNodeOutputs"],
+): AgentInputItem[] => {
+  const agentInput: AgentInputItem[] = [];
 
-    if (!incomingRouterEdges.length) {
-      return true;
+  if (!parentNodeOutputs) {
+    return agentInput;
+  }
+
+  for (const nodeOutput of Array.from(parentNodeOutputs.values())) {
+    if (!nodeOutput.success) {
+      continue;
     }
 
-    for (const routerEdge of incomingRouterEdges) {
-      const routerNodeExecutionOutput = executedNodesMap.get(
-        routerEdge.source,
-      ) as NodeExecutionOutput<RouterAgentOutputsShape> | undefined;
+    const outputs = nodeOutput.outputs as AgentOutputs;
 
-      if (!routerNodeExecutionOutput) {
-        continue;
-      }
-
-      // Router node failed, skip this execution path
-      if (!routerNodeExecutionOutput.success) {
-        remainingNodeIds.delete(nodeId);
-        return false;
-      }
-
-      if (
-        routerNodeExecutionOutput.outputs.selectedCondition.id !==
-        routerEdge.sourceHandle
-      ) {
-        remainingNodeIds.delete(nodeId);
-        return false;
-      }
+    if (!outputs.type || outputs.type !== "agent") {
+      continue;
     }
 
-    return true;
-  });
+    let context = outputs.forwardedContext || "";
+
+    context += `${context.length ? "\n\n" : ""}Agent "${nodeOutput.friendlyName}": ${outputs.finalOutput}`;
+
+    agentInput.push({
+      role: "assistant",
+      status: "completed",
+      content: [
+        {
+          text: context,
+          type: "output_text",
+        },
+      ],
+    });
+  }
+
+  return agentInput;
 };

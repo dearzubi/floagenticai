@@ -7,7 +7,7 @@ export class GoogleAICredentials implements INodeCredential {
   properties: INodeCredential["properties"];
 
   constructor() {
-    this.name = "google_ai_credentials";
+    this.name = "google_gen_ai";
     this.label = "GoogleAI Credentials";
     this.icon = "gemini-logo.svg";
     this.properties = [

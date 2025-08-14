@@ -81,6 +81,7 @@ export const CredentialInput: FC<{
           inputProps={{
             classNames: {
               inputWrapper: "focus-within:!outline-none focus-within:!ring-0",
+              input: "focus:!outline-none focus:ring-0 focus:ring-offset-0",
             },
           }}
         >

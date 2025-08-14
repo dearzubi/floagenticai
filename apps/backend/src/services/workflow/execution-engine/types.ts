@@ -1,11 +1,10 @@
 import {
   AgentToolApprovalItem,
   IWorkflowExecutionError,
-  NodeCredentialNames,
   TriggerNodeNames,
 } from "common";
 import { JsonObject } from "@hatchet-dev/typescript-sdk";
-import { NodeExecutionOutput } from "../nodes/types.js";
+import { NodeExecutionOutput } from "../node/types.js";
 
 export type WorkflowOrchestratorTaskInputs = {
   userId?: string;
@@ -29,12 +28,6 @@ export type WorkflowOrchestratorTaskOutputs =
       success: false;
       error: IWorkflowExecutionError;
     };
-
-export type CredentialData = {
-  id: string;
-  name: NodeCredentialNames;
-  data: Record<string, string>;
-};
 
 export type JsonObjectPath = string;
 

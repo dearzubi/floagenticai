@@ -125,7 +125,7 @@ const Properties: FC<{
             );
           } else if (
             property.type === "propertyCollection" &&
-            property.collection
+            Array.isArray(property.collection)
           ) {
             return (
               <Accordion
@@ -157,7 +157,10 @@ const Properties: FC<{
                 </AccordionItem>
               </Accordion>
             );
-          } else if (property.type === "array" && property.collection) {
+          } else if (
+            property.type === "array" &&
+            Array.isArray(property.collection)
+          ) {
             return (
               <ArrayInput
                 key={property.name}
@@ -185,6 +188,31 @@ const Properties: FC<{
                 }
                 readOnly={readOnly}
               />
+            );
+          } else if (
+            property.type === "section" &&
+            Array.isArray(property.collection)
+          ) {
+            return (
+              <div
+                key={property.name}
+                className={
+                  "flex flex-col gap-4 border border-default-100 rounded p-2 shadow-sm"
+                }
+              >
+                <h3 className=" text-lg font-semibold text-default-800">
+                  {property.label}
+                </h3>
+                <Properties
+                  properties={property.collection}
+                  inputs={inputs}
+                  propertyPath={fullPath}
+                  onInputChange={onInputChange}
+                  selectedVersion={selectedVersion}
+                  onCredentialChange={onCredentialChange}
+                  readOnly={readOnly}
+                />
+              </div>
             );
           }
         })}

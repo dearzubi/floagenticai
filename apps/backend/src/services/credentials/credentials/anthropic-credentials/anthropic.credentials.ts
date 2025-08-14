@@ -7,7 +7,7 @@ export class AnthropicCredentials implements INodeCredential {
   properties: INodeCredential["properties"];
 
   constructor() {
-    this.name = "anthropic_credentials";
+    this.name = "anthropic";
     this.label = "Anthropic Credentials";
     this.icon = "anthropic-logo.svg";
     this.properties = [

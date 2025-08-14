@@ -615,8 +615,8 @@ export const getPropertyInputValue = <T>(
 
   if (
     typeof inputValue === "undefined" ||
-    inputValue === null ||
-    typeof inputValue === "object"
+    inputValue === null
+    // typeof inputValue === "object" //TODO: why the heck was it here?
   ) {
     return _default as T;
   }

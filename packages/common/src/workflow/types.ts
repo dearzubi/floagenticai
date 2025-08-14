@@ -51,7 +51,6 @@ export interface INodeProperty {
   loadMethod?: string;
   default?: CommonPrimitiveTypes | CommonPrimitiveTypes[];
   collection?: INodeProperty[];
-  embeddedCredentials?: NodeCredentialDescription[];
   isMultiline?: boolean;
   minNumber?: number;
   maxNumber?: number;

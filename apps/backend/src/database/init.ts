@@ -59,7 +59,9 @@ export const shutdownDatabase = async (): Promise<void> => {
   }
 };
 
-export const getDB = async (): Promise<(typeof orm)["em"]> => {
+export const getDB = async (): Promise<DB> => {
   const orm = await getORM();
   return orm.em.fork();
 };
+
+export type DB = (typeof orm)["em"];

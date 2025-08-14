@@ -34,7 +34,7 @@ export const chatTriggerEvent = async (
   try {
     logger.info(`Executing chat trigger for workflow: ${data.workflowId}`);
 
-    // TODO: Sanitise user message??
+    // TODO: What to sanitize here and how?
     const userMessage = data.userMessage;
 
     const persistedUserMessage = await createChatMessage(
