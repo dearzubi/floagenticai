@@ -8,6 +8,22 @@ type OpenAIChatModelId = Parameters<ReturnType<typeof createOpenAI>>["0"];
 
 const models = Object.freeze([
   {
+    name: "gpt-5",
+    label: "gpt-5",
+  },
+  {
+    name: "gpt-5-mini",
+    label: "gpt-5-mini",
+  },
+  {
+    name: "gpt-5-nano",
+    label: "gpt-5-nano",
+  },
+  {
+    name: "gpt-5-chat-latest",
+    label: "gpt-5-chat-latest",
+  },
+  {
     name: "gpt-4.1",
     label: "gpt-4.1",
   },
@@ -61,7 +77,7 @@ const models = Object.freeze([
   },
 ] satisfies Models<OpenAIChatModelId>);
 
-const DEFAULT_MODEL: OpenAIChatModelId = "gpt-4o";
+const DEFAULT_MODEL: OpenAIChatModelId = "gpt-5";
 
 const initOptionsSchema = z.object({
   credential: z.union(
