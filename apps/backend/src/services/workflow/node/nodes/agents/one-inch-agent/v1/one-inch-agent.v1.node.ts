@@ -25,7 +25,7 @@ import {
   runAgent,
 } from "../../../../../../ai/agent/agent.js";
 import { creatNodeAgentMemoryManager } from "../../../../../../ai/agent/memory/node.memory.js";
-import { initAgentTools } from "../../../../../../ai/agent/tool.js";
+import { initAgentTools } from "../../../../../../ai/agent/tool/utils.js";
 import { toolNames } from "./constants.js";
 import { validateCredential } from "../../../../../../credentials/crud/util.js";
 import {

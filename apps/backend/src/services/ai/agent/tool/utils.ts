@@ -1,4 +1,4 @@
-import { AgentToolFactory } from "./types.js";
+import { AgentToolFactory } from "../types.js";
 import { Tool } from "@openai/agents";
 
 /**
