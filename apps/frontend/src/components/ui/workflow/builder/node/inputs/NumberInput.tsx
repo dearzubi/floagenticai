@@ -53,6 +53,7 @@ const NumberInput: FC<{
         classNames={{
           innerWrapper:
             "focus-within:!outline-none focus-within:!ring-transparent focus-within:!ring-offset-0",
+          input: "focus:outline-none focus:ring-0 focus:ring-offset-0",
         }}
         aria-label={property.label}
         step="any"

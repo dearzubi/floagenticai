@@ -38,7 +38,7 @@ const motionProps = {
       },
     },
   },
-};
+} as const;
 
 const EditCredentialModal: FC<{
   credentialId: string;

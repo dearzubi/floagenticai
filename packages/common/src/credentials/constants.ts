@@ -1,6 +1,15 @@
+import { ModelProviders } from "../ai/types.js";
+
+const modelProvidersCredentialNames = [
+  "openai",
+  "google_gen_ai",
+  "anthropic",
+  "deepseek",
+  "openrouter",
+] satisfies ModelProviders[];
+
 export const credentialNames = [
-  "open_ai_credentials",
-  "google_ai_credentials",
+  ...modelProvidersCredentialNames,
   "evm_pk_credentials",
   "rpc_credentials",
   "oneinch_credentials",

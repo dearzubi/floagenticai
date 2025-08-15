@@ -1,8 +1,14 @@
 import { z } from "zod/v4";
 
 export const googleAICredentialsSchema = z.object({
-  name: z.literal("google_ai_credentials"),
+  credentialName: z.literal("google_gen_ai"),
   data: z.object({
-    api_key: z.string().nonempty(),
+    api_key: z
+      .string({
+        error: "Please provide your Google AI API key",
+      })
+      .nonempty(),
   }),
 });
+
+export type GoogleAICredentials = z.infer<typeof googleAICredentialsSchema>;

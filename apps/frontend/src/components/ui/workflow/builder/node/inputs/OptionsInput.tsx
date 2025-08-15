@@ -80,7 +80,8 @@ const OptionsInput: FC<{
         inputProps={{
           classNames: {
             inputWrapper:
-              "focus-within:!outline-none focus-within:!ring-transparent focus-within:!ring-offset-0",
+              "focus-within:!outline-none focus-within:!ring-transparent focus-within:!ring-offset-0 ",
+            input: "focus:!outline-none focus:ring-0 focus:ring-offset-0",
           },
         }}
       >

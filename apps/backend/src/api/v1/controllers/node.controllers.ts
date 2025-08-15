@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { workflowNodes } from "../../../services/workflow/builder/nodes/index.js";
+import { workflowNodes } from "../../../services/workflow/node/index.js";
 
 /**
  * List all workflow nodes
