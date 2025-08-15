@@ -8,6 +8,7 @@ import { openAIProviderPropertiesSchema } from "./provider/openai.properties.js"
 import { googleGenAIProviderPropertiesSchema } from "./provider/google.genai.properties.js";
 import { anthropicProviderPropertiesSchema } from "./provider/anthropic.properties.js";
 import { deepseekProviderPropertiesSchema } from "./provider/deepseek.properties.js";
+import { openrouterProviderPropertiesSchema } from "./provider/openrouter.properties.js";
 
 /**
  * Agent configurations node property for workflow nodes.
@@ -151,6 +152,7 @@ const agentConfigurationsPropertyInputSchema = z.object({
       ...googleGenAIProviderPropertiesSchema.shape,
       ...anthropicProviderPropertiesSchema.shape,
       ...deepseekProviderPropertiesSchema.shape,
+      ...openrouterProviderPropertiesSchema.shape,
     }),
 });
 

@@ -4,6 +4,7 @@ import { anthropicProviderProperties } from "./anthropic.properties.js";
 import { ModelProviderProperties } from "./types.js";
 import { ModelProviders } from "common";
 import { deepseekProviderProperties } from "./deepseek.properties.js";
+import { openrouterProviderProperties } from "./openrouter.properties.js";
 
 const getModelProviderProperties = (): ModelProviderProperties[] => {
   return structuredClone([
@@ -11,6 +12,7 @@ const getModelProviderProperties = (): ModelProviderProperties[] => {
     googleGenAIProviderProperties,
     anthropicProviderProperties,
     deepseekProviderProperties,
+    openrouterProviderProperties,
   ]);
 };
 
@@ -19,6 +21,7 @@ const modelProviderNames = Object.freeze([
   "google_gen_ai",
   "anthropic",
   "deepseek",
+  "openrouter",
 ] as const satisfies ModelProviders[]);
 
 export { getModelProviderProperties, modelProviderNames };

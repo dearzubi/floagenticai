@@ -5,6 +5,7 @@ const modelProvidersCredentialNames = [
   "google_gen_ai",
   "anthropic",
   "deepseek",
+  "openrouter",
 ] satisfies ModelProviders[];
 
 export const credentialNames = [
