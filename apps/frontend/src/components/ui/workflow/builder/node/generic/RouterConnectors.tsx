@@ -28,6 +28,7 @@ const RouterConnectors: FC<RouterConnectorsProps> = ({
 }) => {
   const updateNodeInternals = useUpdateNodeInternals();
   const prevConditionsRef = useRef<typeof conditions>([]);
+  const prevConditionIdsRef = useRef<string[]>([]);
 
   const { conditions } = useMemo(() => {
     const currentVersion = nodeData.versions.find(
@@ -62,14 +63,36 @@ const RouterConnectors: FC<RouterConnectorsProps> = ({
     return changed;
   }, [conditions]);
 
+  const conditionIdsChanged = useMemo(() => {
+    const currentIds = conditions.map((c) => c.id);
+    const prevIds = prevConditionIdsRef.current;
+
+    const idsChanged =
+      currentIds.length !== prevIds.length ||
+      currentIds.some((id, index) => id !== prevIds[index]);
+
+    if (idsChanged) {
+      prevConditionIdsRef.current = currentIds;
+    }
+
+    return idsChanged;
+  }, [conditions]);
+
   useEffect(() => {
     if (
       conditionsChanged ||
-      conditions.length !== prevConditionsRef.current.length
+      conditions.length !== prevConditionsRef.current.length ||
+      conditionIdsChanged
     ) {
       updateNodeInternals(nodeData.id);
     }
-  }, [conditionsChanged, conditions.length, nodeData.id, updateNodeInternals]);
+  }, [
+    conditionsChanged,
+    conditions.length,
+    conditionIdsChanged,
+    nodeData.id,
+    updateNodeInternals,
+  ]);
 
   return (
     <div className={"flex"}>
