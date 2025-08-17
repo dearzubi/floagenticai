@@ -42,7 +42,7 @@ const motionProps = {
       },
     },
   },
-};
+} as const;
 
 const ConfigurationModal: FC<{
   openConfigurationModal: boolean;

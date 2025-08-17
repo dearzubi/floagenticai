@@ -54,6 +54,15 @@ export interface INodeProperty {
   isMultiline?: boolean;
   minNumber?: number;
   maxNumber?: number;
+  gridItems?: IGridItem[];
+}
+
+export interface IGridItem {
+  label: string;
+  name: string;
+  description?: string;
+  icon?: string;
+  collection?: INodeProperty[];
 }
 
 export type NodeProperty = z.infer<typeof nodePropertySchema>;

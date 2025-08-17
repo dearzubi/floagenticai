@@ -89,6 +89,14 @@ export const nodePropertyOptionSchema = z.object({
   description: z.string().optional(),
 });
 
+export const nodeGridItemSchema = z.object({
+  label: z.string(),
+  name: z.string().nonempty(),
+  description: z.string().optional(),
+  icon: z.string().optional(),
+  collection: z.array(z.lazy(() => nodePropertySchema)).optional(),
+});
+
 export const nodePropertySchema: z.ZodType<INodeProperty> = z.lazy(() =>
   z.object({
     label: z.string(),
@@ -112,10 +120,11 @@ export const nodePropertySchema: z.ZodType<INodeProperty> = z.lazy(() =>
         ]),
       )
       .optional(),
-    collection: z.array(nodePropertySchema).optional(),
+    collection: z.array(z.lazy(() => nodePropertySchema)).optional(),
     isMultiline: z.boolean().optional(),
     minNumber: z.number().optional(),
     maxNumber: z.number().optional(),
+    gridItems: z.array(nodeGridItemSchema).optional(),
   }),
 );
 

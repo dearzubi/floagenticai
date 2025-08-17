@@ -11,6 +11,7 @@ import JsonSchemaInput from "../inputs/json-schema/JsonSchemaInput.tsx";
 import ArrayInput from "../inputs/ArrayInput.tsx";
 import MultiOptionsInput from "../inputs/MultiOptionsInput.tsx";
 import CredentialInput from "../inputs/CredentialInput.tsx";
+import GridInput from "../inputs/GridInput.tsx";
 
 const Properties: FC<{
   properties: INodeProperty[];
@@ -23,6 +24,7 @@ const Properties: FC<{
     credentialId: string | null,
   ) => void;
   readOnly?: boolean;
+  breadcrumbTrail?: string[];
 }> = ({
   properties,
   inputs,
@@ -31,6 +33,7 @@ const Properties: FC<{
   selectedVersion,
   onCredentialChange,
   readOnly = false,
+  breadcrumbTrail = [],
 }) => {
   return (
     <>
@@ -213,6 +216,21 @@ const Properties: FC<{
                   readOnly={readOnly}
                 />
               </div>
+            );
+          } else if (
+            property.type === "grid" &&
+            Array.isArray(property.gridItems)
+          ) {
+            return (
+              <GridInput
+                key={property.name}
+                property={property}
+                inputs={inputs}
+                propertyPath={fullPath}
+                onInputChange={onInputChange}
+                readOnly={readOnly}
+                breadcrumbTrail={[...breadcrumbTrail, property.label]}
+              />
             );
           }
         })}
