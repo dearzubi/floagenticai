@@ -122,10 +122,19 @@ export class RouterAgentV1Node implements INodeVersion {
         });
       validatedInputs.agent_configurations.llm_configurations.enable_memory =
         false;
-      validatedInputs.agent_configurations.llm_configurations.advanced_settings.maxTokens =
-        undefined;
-      validatedInputs.agent_configurations.llm_configurations.advanced_settings.streaming =
-        false;
+
+      if (
+        validatedInputs.agent_configurations.llm_configurations
+          .advanced_settings
+      ) {
+        validatedInputs.agent_configurations.llm_configurations.advanced_settings =
+          {
+            ...validatedInputs.agent_configurations.llm_configurations
+              .advanced_settings,
+            maxTokens: undefined,
+            streaming: false,
+          };
+      }
 
       const agent = createAgentFromNodeInputs<
         unknown,

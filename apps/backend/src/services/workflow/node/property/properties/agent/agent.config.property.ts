@@ -33,6 +33,9 @@ const getAgentConfigurationsNodeProperty = (options?: {
             label: "Model",
             type: "asyncOptions",
             loadMethod: "getModelsList",
+            dependencies: [
+              "agent_configurations.llm_configurations.model_provider",
+            ],
             displayOptions: {
               show: {
                 "agent_configurations.llm_configurations.model_provider": [

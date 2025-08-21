@@ -174,7 +174,7 @@ const createAgentFromNodeInputs = <
         ...configurations.advanced_settings,
         toolChoice,
         enableMemory: configurations.enable_memory,
-        enableStreaming: configurations.advanced_settings.streaming,
+        enableStreaming: configurations.advanced_settings?.streaming,
       },
       provider: {
         name: configurations.model_provider as ModelProviders,

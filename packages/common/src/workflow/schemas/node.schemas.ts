@@ -112,6 +112,7 @@ export const nodePropertySchema: z.ZodType<INodeProperty> = z.lazy(() =>
     options: z.array(nodePropertyOptionSchema).optional(),
     hidden: z.boolean().optional(),
     loadMethod: z.string().optional(),
+    dependencies: z.array(z.string()).optional(),
     default: z
       .lazy(() =>
         z.union([

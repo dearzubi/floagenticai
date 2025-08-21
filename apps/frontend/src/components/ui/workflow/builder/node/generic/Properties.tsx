@@ -257,7 +257,7 @@ const Properties: FC<{
                 key={property.name}
                 property={property}
                 inputs={inputs}
-                fullPath={fullPath}
+                propertyPath={fullPath}
                 onInputChange={onInputChange}
                 selectedVersion={selectedVersion}
                 nodeName={nodeName}

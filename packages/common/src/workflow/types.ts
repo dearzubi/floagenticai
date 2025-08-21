@@ -49,6 +49,7 @@ export interface INodeProperty {
   options?: NodePropertyOption[];
   hidden?: boolean;
   loadMethod?: string;
+  dependencies?: string[];
   default?: CommonPrimitiveTypes | CommonPrimitiveTypes[];
   collection?: INodeProperty[];
   isMultiline?: boolean;

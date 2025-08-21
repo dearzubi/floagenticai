@@ -62,6 +62,7 @@ const GridItem: FC<{
         propertyPath={propertyPath}
         onInputChange={onInputChange}
         readOnly={readOnly}
+        breadcrumbTrail={breadcrumbTrail}
         nodeName={nodeName}
         isLoading={isLoading}
       />
