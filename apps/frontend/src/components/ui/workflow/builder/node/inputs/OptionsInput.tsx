@@ -11,7 +11,15 @@ const OptionsInput: FC<{
   propertyPath: string;
   onInputChange?: (path: string, value: unknown) => void;
   readOnly?: boolean;
-}> = ({ property, inputs, propertyPath, onInputChange, readOnly = false }) => {
+  isLoading?: boolean;
+}> = ({
+  property,
+  inputs,
+  propertyPath,
+  onInputChange,
+  readOnly = false,
+  isLoading,
+}) => {
   const initialValue = getPropertyInputValue(
     inputs,
     propertyPath,
@@ -52,9 +60,10 @@ const OptionsInput: FC<{
     <div className="flex flex-col gap-2">
       <Label property={property} />
       <Autocomplete
+        isLoading={isLoading}
         selectedKey={initialValue as string}
         aria-label={property.label}
-        isDisabled={readOnly}
+        isDisabled={readOnly || isLoading}
         startContent={
           selectedOptionIcon ? (
             <img

@@ -1,4 +1,4 @@
-import { WalletTypes } from "../../../blockchain/wallet/types.js";
+import { WalletTypes } from "../../../../blockchain/wallet/types.js";
 import { NodeProperty } from "common";
 
 export const evmWeb3WalletProperties = {

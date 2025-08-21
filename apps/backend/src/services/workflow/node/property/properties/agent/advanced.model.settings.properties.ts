@@ -1,7 +1,7 @@
 import { NodeProperty } from "common";
 import { z } from "zod/v4";
 
-export const getCommonModelProperties = (): NodeProperty[] => {
+export const getAdvancedModelSettingsProperties = (): NodeProperty[] => {
   return [
     {
       name: "streaming",
@@ -54,41 +54,15 @@ export const getCommonModelProperties = (): NodeProperty[] => {
       minNumber: -2,
       maxNumber: 2,
     },
-    // {
-    //   name: "additional_parameters",
-    //   label: "Additional Parameters",
-    //   type: "propertyCollection",
-    //   optional: true,
-    //   collection: [
-    //     // {
-    //     //   name: "timeout",
-    //     //   label: "Timeout",
-    //     //   type: "positiveNumber",
-    //     //   optional: true,
-    //     //   minNumber: 0,
-    //     //   maxNumber: 60,
-    //     //   hidden: true, //TODO: Handle timeout later
-    //     // },
-    //     // {
-    //     //   name: "parallel_tool_calls",
-    //     //   label: "Parallel Tool Calls",
-    //     //   type: "boolean",
-    //     //   optional: true,
-    //     //   default: true,
-    //     //   description: "Allows multiple tools to be called in parallel",
-    //     //   hidden: true, //TODO: Handle parallel_tool_calls later
-    //     // },
-    //   ],
-    // },
   ];
 };
-export const commonModelSettingsSchema = z.object({
+export const advancedModelSettingsSchema = z.object({
   streaming: z
     .boolean({
       error: "Streaming must be true or false",
     })
     .nullish()
-    .transform((v) => (typeof v === "boolean" ? v : false)),
+    .transform((v) => (typeof v === "boolean" ? v : true)),
   temperature: z
     .number({
       error: "Temperature must be a number between 0 and 2",
@@ -128,24 +102,4 @@ export const commonModelSettingsSchema = z.object({
     .max(2)
     .nullish()
     .transform((v) => (v === null ? undefined : v)),
-
-  // additional_parameters: z
-  //   .object({
-  //
-  //     timeout: z
-  //       .number({
-  //         error: "Timeout must be a number between 0 and 60",
-  //       })
-  //       .min(0)
-  //       .max(60)
-  //       .nullish()
-  //       .transform((v) => (v === null ? undefined : v)),
-  //     parallel_tool_calls: z
-  //       .boolean({
-  //         error: "Parallel tool calls must be true or false",
-  //       })
-  //       .nullish()
-  //       .transform((v) => (typeof v === "boolean" ? v : true)),
-  //   })
-  //   .nullish(),
 });

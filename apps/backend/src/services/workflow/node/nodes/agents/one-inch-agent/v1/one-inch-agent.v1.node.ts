@@ -16,8 +16,8 @@ import { oneInchToolFactories, toolOptions } from "./tool/index.js";
 import { OneInchToolsContext } from "./tool/types.js";
 import { supportedNetworks } from "../../../../../../blockchain/platform/oneinch/constants.js";
 import { SupportedNetworks } from "../../../../../../blockchain/platform/oneinch/types.js";
-import { getAgentConfigurationsNodeProperty } from "../../../../properties/agent/agent.config.property.js";
-import { evmWeb3WalletProperties } from "../../../../properties/web3.wallet.properties.js";
+import { getAgentConfigurationsNodeProperty } from "../../../../property/properties/agent/agent.config.property.js";
+import { evmWeb3WalletProperties } from "../../../../property/properties/web3.wallet.properties.js";
 import { AgentOutputs } from "../../../../../../ai/agent/types.js";
 import {
   createAgentFromNodeInputs,
@@ -48,10 +48,7 @@ export class OneInchAgentV1Node implements INodeVersion {
     this.description = {
       version: 1,
       properties: [
-        getAgentConfigurationsNodeProperty({
-          disableStreamingProperty: true, //Disable streaming to capture tool calls. TODO: How about hybrid approach?
-          disableMaxTokensProperty: true, // Disable max tokens to get full output from the agent
-        }),
+        getAgentConfigurationsNodeProperty(),
         {
           label: "1Inch Configurations",
           name: "oneinch_configurations",
@@ -141,20 +138,10 @@ export class OneInchAgentV1Node implements INodeVersion {
         inputs,
       });
 
-      const agentConfigurations = validatedInputs.agent_configurations;
-
-      // agentConfigurations = {
-      //   ...agentConfigurations,
-      //   [agentConfigurations.model_provider]: {
-      //     ...agentConfigurations[agentConfigurations.model_provider],
-      //     streaming: false,
-      //   },
-      // };
-
       const agent = createAgentFromNodeInputs<OneInchToolsContext>({
         nodeId: id,
         credentials: credentials || [],
-        configurations: agentConfigurations,
+        inputs: validatedInputs,
         tools: initAgentTools<ToolNames, OneInchToolsContext>({
           toolsList: Array.from(toolNames.values()),
           selectedToolsList: validatedInputs.oneinch_configurations.tools || [],

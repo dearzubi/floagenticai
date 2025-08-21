@@ -2,10 +2,8 @@ import { NodeCategories, NodeNames } from "common";
 import { IBaseNode } from "./types.js";
 import { AgentNode } from "./nodes/agents/agent/agent.node.js";
 import { RouterAgentNode } from "./nodes/agents/router-agent/router-agent.node.js";
-import { ManualTriggerNode } from "./nodes/triggers/manual/manual.trigger.node.js";
 import { logger } from "../../../utils/logger/index.js";
 import { ChatTriggerNode } from "./nodes/triggers/chat/chat.trigger.node.js";
-import { OneInchAgentNode } from "./nodes/agents/one-inch-agent/one-inch-agent.node.js";
 
 /**
  * Represents a collection of all available workflow nodes categorized by their respective categories.
@@ -17,13 +15,22 @@ export const workflowNodes: Record<
   Agents: {
     agent: new AgentNode(),
     router_agent: new RouterAgentNode(),
-    one_inch_agent: new OneInchAgentNode(),
+    // one_inch_agent: new OneInchAgentNode(), //TODO: Will get back to OneInchAgentNode later
   },
   Triggers: {
-    manual_trigger: new ManualTriggerNode(),
+    // manual_trigger: new ManualTriggerNode(), TODO: Will get back to ManualTriggerNode later
     chat_trigger: new ChatTriggerNode(),
   },
 };
+
+export const workflowNodesMap = new Map<NodeNames, IBaseNode>(
+  Object.entries(workflowNodes).flatMap(([_category, categoryNodes]) =>
+    Object.entries(categoryNodes).map(([nodeName, nodeInstance]) => [
+      nodeName as NodeNames,
+      nodeInstance,
+    ]),
+  ),
+);
 
 const nodeCounts = Object.entries(workflowNodes).reduce(
   (acc, [category, categoryNodes]) => {

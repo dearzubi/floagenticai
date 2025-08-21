@@ -37,6 +37,8 @@ const GridInput: FC<{
   onInputChange?: (path: string, value: unknown) => void;
   readOnly?: boolean;
   breadcrumbTrail?: string[];
+  nodeName?: string;
+  isLoading?: boolean;
 }> = ({
   property,
   inputs,
@@ -44,6 +46,8 @@ const GridInput: FC<{
   onInputChange,
   readOnly = false,
   breadcrumbTrail = [],
+  nodeName,
+  isLoading,
 }) => {
   const [selectedGridItem, setSelectedGridItem] = useState<string | null>(null);
 
@@ -119,6 +123,8 @@ const GridInput: FC<{
                 property.label,
                 selectedGridItemData?.label || "",
               ]}
+              nodeName={nodeName}
+              isLoading={isLoading}
             />
           </div>
         </motion.div>

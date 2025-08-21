@@ -12,7 +12,7 @@ import {
 import {
   agentConfigurationsPropertyInputSchema,
   getAgentConfigurationsNodeProperty,
-} from "../../../../properties/agent/agent.config.property.js";
+} from "../../../../property/properties/agent/agent.config.property.js";
 import {
   createAgentFromNodeInputs,
   processAgenRunResultForNode,
@@ -20,9 +20,11 @@ import {
 } from "../../../../../../ai/agent/agent.js";
 import { creatNodeAgentMemoryManager } from "../../../../../../ai/agent/memory/node.memory.js";
 import { AgentOutputs } from "../../../../../../ai/agent/types.js";
+import { agentLoadMethods } from "../../../../property/load-methods/agent.load.methods.js";
 
 export class AgentV1Node implements INodeVersion {
   description: NodeVersionDescription;
+  loadMethods = agentLoadMethods;
 
   constructor() {
     this.description = {
@@ -55,7 +57,7 @@ export class AgentV1Node implements INodeVersion {
       const agent = createAgentFromNodeInputs({
         nodeId: id,
         credentials: credentials || [],
-        configurations: validatedInputs.agent_configurations,
+        inputs: validatedInputs,
       });
 
       const nodeMemoryManager = creatNodeAgentMemoryManager({

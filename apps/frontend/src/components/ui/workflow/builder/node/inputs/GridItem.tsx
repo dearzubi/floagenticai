@@ -12,6 +12,8 @@ const GridItem: FC<{
   readOnly?: boolean;
   parentGridLabel?: string;
   breadcrumbTrail?: string[];
+  nodeName?: string;
+  isLoading?: boolean;
 }> = ({
   gridItem,
   inputs,
@@ -20,6 +22,8 @@ const GridItem: FC<{
   readOnly = false,
   parentGridLabel,
   breadcrumbTrail = [],
+  nodeName,
+  isLoading,
 }) => {
   if (!gridItem.collection) {
     return (
@@ -29,7 +33,6 @@ const GridItem: FC<{
     );
   }
 
-  // Check if any property in the collection is a grid type
   const hasGridProperties = gridItem.collection?.some(
     (prop) => prop.type === "grid",
   );
@@ -43,7 +46,7 @@ const GridItem: FC<{
       {hasGridProperties && parentGridLabel && (
         <div className="flex items-center gap-1 text-xs text-default-500">
           {breadcrumbTrail.map((item, index) => (
-            <div key={index} className="flex items-center gap-1">
+            <div key={item + index} className="flex items-center gap-1">
               {index > 0 && (
                 <Icon icon="lucide:chevron-right" className="w-3 h-3" />
               )}
@@ -59,6 +62,8 @@ const GridItem: FC<{
         propertyPath={propertyPath}
         onInputChange={onInputChange}
         readOnly={readOnly}
+        nodeName={nodeName}
+        isLoading={isLoading}
       />
     </div>
   );

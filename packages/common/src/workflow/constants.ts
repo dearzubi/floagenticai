@@ -23,6 +23,7 @@ export const nodePropertyTypes = [
   "file",
   "array",
   "propertyCollection",
+  "asyncPropertyCollection",
   "credential",
   "section",
   "grid",

@@ -18,7 +18,7 @@ import {
   getContextFromParentAgentNodes,
   publishWorkflowNodeExecutionEvent,
 } from "../../../../../execution-engine/utils.js";
-import { getAgentConfigurationsNodeProperty } from "../../../../properties/agent/agent.config.property.js";
+import { getAgentConfigurationsNodeProperty } from "../../../../property/properties/agent/agent.config.property.js";
 import {
   createAgentFromNodeInputs,
   processAgenRunResultForNode,
@@ -37,11 +37,8 @@ export class RouterAgentV1Node implements INodeVersion {
       properties: [
         getAgentConfigurationsNodeProperty({
           disableInstructionsProperty: true,
-          disableInputMessageProperty: true,
           disableMemoryProperty: true,
           disableOutputStructureProperty: true,
-          disableMaxTokensProperty: true,
-          disableStreamingProperty: true,
         }),
         {
           label: "Router Configurations",
@@ -114,27 +111,21 @@ export class RouterAgentV1Node implements INodeVersion {
         inputs,
       });
 
-      let agentConfigurations = validatedInputs.agent_configurations;
-
-      agentConfigurations.output_structure =
+      validatedInputs.agent_configurations.llm_configurations.output_structure =
         outputStructureSchema as unknown as Record<string, unknown>;
-      agentConfigurations.instructions = buildRouterAgentInstructions({
-        conditions: validatedInputs.router_configurations.conditions,
-        defaultConditionId:
-          validatedInputs.router_configurations.default_condition,
-        instructions: "",
-      });
-      agentConfigurations.enable_memory = false;
-      agentConfigurations.input_message = "";
-
-      agentConfigurations = {
-        ...agentConfigurations,
-        [agentConfigurations.model_provider]: {
-          ...agentConfigurations[agentConfigurations.model_provider],
-          streaming: false, // Disable streaming for router agent
-          maxTokens: undefined, // Disable max tokens for router agent
-        },
-      };
+      validatedInputs.agent_configurations.llm_configurations.instructions =
+        buildRouterAgentInstructions({
+          conditions: validatedInputs.router_configurations.conditions,
+          defaultConditionId:
+            validatedInputs.router_configurations.default_condition,
+          instructions: "",
+        });
+      validatedInputs.agent_configurations.llm_configurations.enable_memory =
+        false;
+      validatedInputs.agent_configurations.llm_configurations.advanced_settings.maxTokens =
+        undefined;
+      validatedInputs.agent_configurations.llm_configurations.advanced_settings.streaming =
+        false;
 
       const agent = createAgentFromNodeInputs<
         unknown,
@@ -142,7 +133,7 @@ export class RouterAgentV1Node implements INodeVersion {
       >({
         nodeId: id,
         credentials: credentials || [],
-        configurations: agentConfigurations,
+        inputs: validatedInputs,
       });
 
       const nodeMemoryManager = creatNodeAgentMemoryManager({

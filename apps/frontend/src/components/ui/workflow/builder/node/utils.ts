@@ -55,7 +55,6 @@ const initialisePropertyInputs = (
     } else if (property.type === "array" && property.collection) {
       inputs[property.name] = [];
     } else if (property.type === "grid" && property.gridItems) {
-      // Initialize grid with empty object for each grid item
       inputs[property.name] = {};
       for (const gridItem of property.gridItems) {
         if (gridItem.collection) {

@@ -339,6 +339,7 @@ const ConfigurationModal: FC<{
                       properties={selectedVersion.properties}
                       onInputChange={handleInputChange}
                       selectedVersion={selectedVersion}
+                      nodeName={nodeData.name}
                       onCredentialChange={handleCredentialChange}
                       readOnly={readOnly}
                     />

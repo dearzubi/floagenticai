@@ -1,6 +1,6 @@
 import { z } from "zod/v4";
 import { z as zodv3 } from "zod";
-import { agentConfigurationsPropertyInputSchema } from "../../../../properties/agent/agent.config.property.js";
+import { agentConfigurationsPropertyInputSchema } from "../../../../property/properties/agent/agent.config.property.js";
 
 export const conditionSchema = z.object({
   id: z.string(),
