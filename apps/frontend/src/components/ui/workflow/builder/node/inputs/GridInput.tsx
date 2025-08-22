@@ -1,6 +1,6 @@
 import { FC, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { INodeProperty } from "common";
+import { INodeProperty, WorkflowBuilderUINodeData } from "common";
 import { Card, CardBody, Button, Tooltip } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import GridItem from "./GridItem.tsx";
@@ -35,10 +35,15 @@ const GridInput: FC<{
   inputs: Record<string, unknown>;
   propertyPath: string;
   onInputChange?: (path: string, value: unknown) => void;
+  selectedVersion?: WorkflowBuilderUINodeData["versions"][number];
   readOnly?: boolean;
   breadcrumbTrail?: string[];
   nodeName?: string;
   isLoading?: boolean;
+  onCredentialChange?: (
+    credentialName: string,
+    credentialId: string | null,
+  ) => void;
 }> = ({
   property,
   inputs,
@@ -46,8 +51,10 @@ const GridInput: FC<{
   onInputChange,
   readOnly = false,
   breadcrumbTrail = [],
+  selectedVersion,
   nodeName,
   isLoading,
+  onCredentialChange,
 }) => {
   const [selectedGridItem, setSelectedGridItem] = useState<string | null>(null);
 
@@ -125,6 +132,8 @@ const GridInput: FC<{
               ]}
               nodeName={nodeName}
               isLoading={isLoading}
+              onCredentialChange={onCredentialChange}
+              selectedVersion={selectedVersion}
             />
           </div>
         </motion.div>
@@ -143,7 +152,9 @@ const GridInput: FC<{
         className="flex flex-col gap-4"
       >
         <div className="flex items-center justify-between">
-          <span className="text-sm font-medium">{property.label}</span>
+          <span className="text-lg font-semibold text-default-800">
+            {property.label}
+          </span>
         </div>
 
         {property.description && (
@@ -153,28 +164,19 @@ const GridInput: FC<{
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {property.gridItems.map((gridItem) => {
             return (
-              <motion.div
-                key={gridItem.name}
-                variants={itemVariants}
-                whileHover={{
-                  scale: 1.02,
-                  y: -4,
-                  transition: { duration: 0.2 },
-                }}
-                whileTap={{ scale: 0.98 }}
-              >
+              <motion.div key={gridItem.name} variants={itemVariants}>
                 <Card
                   isPressable={!readOnly}
                   className={cn(
-                    "transition-all duration-300 ease-in-out cursor-pointer",
+                    "transition-all duration-300 ease-in-out cursor-pointer shadow-sm border-default-200 w-[220px]",
                     "bg-white dark:bg-default-100",
-                    "hover:shadow-sm hover:border-default-200 focus:outline-none",
+                    "focus:outline-none hover:border-default-200 hover:bg-default-50",
                     readOnly && "cursor-default",
                   )}
                   onPress={() => handleGridItemClick(gridItem.name)}
                 >
                   <CardBody className="p-4">
-                    <div className="flex flex-col items-center text-center gap-2">
+                    <div className="flex flex-col items-center text-center gap-4">
                       {gridItem.icon && (
                         <div className="flex-shrink-0">
                           <Icon
@@ -184,7 +186,7 @@ const GridInput: FC<{
                         </div>
                       )}
                       <div className="flex flex-col gap-1">
-                        <h3 className="text-sm font-semibold text-default-800">
+                        <h3 className="text-sm text-default-800">
                           {gridItem.label}
                         </h3>
                         {gridItem.description && (

@@ -390,6 +390,12 @@ export const workflowOrchestratorTask = hatchet.durableTask<
       input;
     const executionId = ctx.workflowRunId();
     try {
+      const decryptedTriggerData = decryptData(encryptedTriggerData);
+
+      const triggerData = safeParseJSON<Record<string, unknown>>(
+        decryptedTriggerData.ok ? decryptedTriggerData.plainText : "{}",
+      );
+
       const decryptedFlowData = decryptData(input.encryptedFlowData);
 
       const { nodes, edges } = parseWorkflow(
@@ -410,12 +416,6 @@ export const workflowOrchestratorTask = hatchet.durableTask<
 
       const maxIterations = remainingNodeIds.size * 2;
       let currentIteration = 0;
-
-      const decryptedTriggerData = decryptData(encryptedTriggerData);
-
-      const triggerData = safeParseJSON<Record<string, unknown>>(
-        decryptedTriggerData.ok ? decryptedTriggerData.plainText : "{}",
-      );
 
       while (remainingNodeIds.size > 0 && currentIteration < maxIterations) {
         currentIteration++;

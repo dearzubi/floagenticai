@@ -27,59 +27,74 @@ import {
 import { creatNodeAgentMemoryManager } from "../../../../../../ai/agent/memory/node.memory.js";
 import { AgentOutputs } from "../../../../../../ai/agent/types.js";
 import { AgentInputItem } from "@openai/agents";
+import { agentLoadMethods } from "../../../../property/load-methods/agent.load.methods.js";
 
 export class RouterAgentV1Node implements INodeVersion {
   description: NodeVersionDescription;
+  loadMethods = {
+    ...agentLoadMethods,
+  };
 
   constructor() {
+    const agentConfigurationsProperty = getAgentConfigurationsNodeProperty({
+      disableInstructionsProperty: true,
+      disableMemoryProperty: true,
+      disableOutputStructureProperty: true,
+    });
+
     this.description = {
       version: 1,
       properties: [
-        getAgentConfigurationsNodeProperty({
-          disableInstructionsProperty: true,
-          disableMemoryProperty: true,
-          disableOutputStructureProperty: true,
-        }),
+        agentConfigurationsProperty,
         {
-          label: "Router Configurations",
           name: "router_configurations",
-          type: "section",
-          collection: [
+          label: "Router Configurations",
+          type: "grid",
+          gridItems: [
             {
-              name: "conditions",
-              label: "Routing Conditions",
-              type: "array",
-              description:
-                "Add one or more routing conditions. The router will evaluate them in order and select the first matching condition.",
+              label: "Routing Configurations",
+              name: "routing_configurations",
+              icon: "material-symbols:arrow-split-rounded",
               collection: [
                 {
-                  name: "id",
-                  label: "Condition ID",
-                  type: "string",
-                  description: "Unique identifier to represent output route.",
+                  name: "conditions",
+                  label: "Routing Conditions",
+                  type: "array",
+                  description:
+                    "Add one or more routing conditions. The router will evaluate them in order and select the first matching condition.",
+                  collection: [
+                    {
+                      name: "id",
+                      label: "Condition ID",
+                      type: "string",
+                      description:
+                        "Unique identifier to represent output route.",
+                    },
+                    {
+                      name: "name",
+                      label: "Condition Name",
+                      type: "string",
+                      description: "Human-readable name for your reference.",
+                    },
+                    {
+                      name: "expression",
+                      label: "Condition Expression",
+                      type: "string",
+                      description:
+                        "Describe when should this condition be met.",
+                      isMultiline: true,
+                    },
+                  ],
                 },
                 {
-                  name: "name",
-                  label: "Condition Name",
+                  name: "default_condition",
+                  label: "Default Condition ID",
                   type: "string",
-                  description: "Human-readable name for your reference.",
-                },
-                {
-                  name: "expression",
-                  label: "Condition Expression",
-                  type: "string",
-                  description: "Describe when should this condition be met.",
-                  isMultiline: true,
+                  optional: true,
+                  description:
+                    "ID of the condition to use when no other conditions match",
                 },
               ],
-            },
-            {
-              name: "default_condition",
-              label: "Default Condition ID",
-              type: "string",
-              optional: true,
-              description:
-                "ID of the condition to use when no other conditions match",
             },
           ],
         },
@@ -115,9 +130,12 @@ export class RouterAgentV1Node implements INodeVersion {
         outputStructureSchema as unknown as Record<string, unknown>;
       validatedInputs.agent_configurations.llm_configurations.instructions =
         buildRouterAgentInstructions({
-          conditions: validatedInputs.router_configurations.conditions,
+          conditions:
+            validatedInputs.router_configurations.routing_configurations
+              .conditions,
           defaultConditionId:
-            validatedInputs.router_configurations.default_condition,
+            validatedInputs.router_configurations.routing_configurations
+              .default_condition,
           instructions: "",
         });
       validatedInputs.agent_configurations.llm_configurations.enable_memory =
@@ -193,8 +211,9 @@ export class RouterAgentV1Node implements INodeVersion {
 
       const selectedCondition = getSelectedCondition(
         evaluationResult.selectedConditionId,
-        validatedInputs.router_configurations.conditions,
-        validatedInputs.router_configurations.default_condition,
+        validatedInputs.router_configurations.routing_configurations.conditions,
+        validatedInputs.router_configurations.routing_configurations
+          .default_condition,
       );
 
       await publishWorkflowNodeExecutionEvent({

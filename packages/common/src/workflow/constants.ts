@@ -25,6 +25,7 @@ export const nodePropertyTypes = [
   "propertyCollection",
   "asyncPropertyCollection",
   "credential",
+  "asyncCredential",
   "section",
   "grid",
 ] as const;

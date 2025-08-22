@@ -22,6 +22,7 @@ export interface AsyncPropertyLoaderResult {
   data?: {
     options?: NodePropertyOption[];
     collection?: INodeProperty[];
+    credentialName?: string;
   };
   isLoading: boolean;
   isError: boolean;
@@ -77,11 +78,13 @@ export const useAsyncPropertyLoader = ({
     {
       options?: NodePropertyOption[];
       collection?: INodeProperty[];
+      credentialName?: string;
     },
     Error,
     {
       options?: NodePropertyOption[];
       collection?: INodeProperty[];
+      credentialName?: string;
     },
     (string | Record<string, unknown>)[]
   > = {

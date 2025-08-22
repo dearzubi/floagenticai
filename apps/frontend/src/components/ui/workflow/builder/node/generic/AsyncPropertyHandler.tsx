@@ -29,8 +29,6 @@ const AsyncPropertyHandler: FC<{
   readOnly = false,
   breadcrumbTrail = [],
 }) => {
-  console.log(inputs);
-
   const { data, isLoading, isError, isBackgroundLoading, hasData } =
     useAsyncPropertyLoader({
       nodeName: nodeName || "",

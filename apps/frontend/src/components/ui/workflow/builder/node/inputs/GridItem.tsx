@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { IGridItem, INodeProperty } from "common";
+import { IGridItem, INodeProperty, WorkflowBuilderUINodeData } from "common";
 import Properties from "../generic/Properties.tsx";
 import { Icon } from "@iconify/react";
 import GridInput from "./GridInput.tsx";
@@ -14,6 +14,11 @@ const GridItem: FC<{
   breadcrumbTrail?: string[];
   nodeName?: string;
   isLoading?: boolean;
+  onCredentialChange?: (
+    credentialName: string,
+    credentialId: string | null,
+  ) => void;
+  selectedVersion?: WorkflowBuilderUINodeData["versions"][number];
 }> = ({
   gridItem,
   inputs,
@@ -24,6 +29,8 @@ const GridItem: FC<{
   breadcrumbTrail = [],
   nodeName,
   isLoading,
+  onCredentialChange,
+  selectedVersion,
 }) => {
   if (!gridItem.collection) {
     return (
@@ -65,6 +72,8 @@ const GridItem: FC<{
         breadcrumbTrail={breadcrumbTrail}
         nodeName={nodeName}
         isLoading={isLoading}
+        onCredentialChange={onCredentialChange}
+        selectedVersion={selectedVersion}
       />
     </div>
   );

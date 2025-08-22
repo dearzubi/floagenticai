@@ -29,6 +29,26 @@ const getAgentConfigurationsNodeProperty = (options?: {
             loadMethod: "getModelProvidersList",
           },
           {
+            type: "asyncCredential",
+            label: "Credentials",
+            name: "credential", // Placeholder for credential actual name
+            loadMethod: "getModelProviderCredential",
+            dependencies: [
+              "agent_configurations.llm_configurations.model_provider",
+            ],
+            displayOptions: {
+              show: {
+                "agent_configurations.llm_configurations.model_provider": [
+                  {
+                    _cnd: {
+                      exists: true,
+                    },
+                  },
+                ],
+              },
+            },
+          },
+          {
             name: "model",
             label: "Model",
             type: "asyncOptions",

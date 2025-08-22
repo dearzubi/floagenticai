@@ -13,6 +13,7 @@ import MultiOptionsInput from "../inputs/MultiOptionsInput.tsx";
 import CredentialInput from "../inputs/CredentialInput.tsx";
 import GridInput from "../inputs/GridInput.tsx";
 import AsyncPropertyHandler from "./AsyncPropertyHandler.tsx";
+import AsyncCredentialHandler from "./AsyncCredentialHandler.tsx";
 
 const Properties: FC<{
   properties: INodeProperty[];
@@ -245,6 +246,8 @@ const Properties: FC<{
                 breadcrumbTrail={[...breadcrumbTrail, property.label]}
                 nodeName={nodeName}
                 isLoading={isLoading}
+                onCredentialChange={onCredentialChange}
+                selectedVersion={selectedVersion}
               />
             );
           } else if (
@@ -264,6 +267,21 @@ const Properties: FC<{
                 onCredentialChange={onCredentialChange}
                 readOnly={readOnly}
                 breadcrumbTrail={breadcrumbTrail}
+              />
+            );
+          } else if (
+            property.type === "asyncCredential" &&
+            property.loadMethod
+          ) {
+            return (
+              <AsyncCredentialHandler
+                key={property.name}
+                property={property}
+                inputs={inputs}
+                selectedVersion={selectedVersion}
+                nodeName={nodeName}
+                onCredentialChange={onCredentialChange}
+                readOnly={readOnly}
               />
             );
           }

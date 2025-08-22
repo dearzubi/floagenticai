@@ -58,4 +58,34 @@ export const agentLoadMethods: INodeVersion["loadMethods"] = {
       collection: getAdvancedModelSettingsProperties(),
     };
   },
+
+  getModelProviderCredential: async (
+    inputs: Record<string, unknown>,
+  ): Promise<{
+    options?: NodePropertyOption[];
+    collection?: INodeProperty[];
+    credentialName?: string;
+  }> => {
+    const validatedInputs = validateNodePropertyInputSchema({
+      schema: agentConfigurationsPropertyInputSchema,
+      inputs,
+    });
+    const provider =
+      validatedInputs.agent_configurations.llm_configurations.model_provider;
+
+    switch (provider) {
+      case "openai":
+        return { credentialName: "openai" };
+      case "google_gen_ai":
+        return { credentialName: "google_gen_ai" };
+      case "anthropic":
+        return { credentialName: "anthropic" };
+      case "deepseek":
+        return { credentialName: "deepseek" };
+      case "openrouter":
+        return { credentialName: "openrouter" };
+      default:
+        return {};
+    }
+  },
 };

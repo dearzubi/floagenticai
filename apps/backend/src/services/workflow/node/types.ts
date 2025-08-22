@@ -58,6 +58,7 @@ export interface INodeVersion {
     (inputs: Record<string, unknown>) => Promise<{
       options?: NodePropertyOption[];
       collection?: INodeProperty[];
+      credentialName?: string;
     }>
   >;
 }

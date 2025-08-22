@@ -111,6 +111,7 @@ export type ImportWorkflowAPIResponse = z.infer<
 export const loadMethodAPIResponseSchema = z.object({
   options: z.array(nodePropertyOptionSchema).optional(),
   collection: z.array(nodePropertySchema).optional(),
+  credentialName: z.string().optional(),
 });
 
 export type LoadMethodAPIResponse = z.infer<typeof loadMethodAPIResponseSchema>;

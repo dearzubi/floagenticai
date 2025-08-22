@@ -7,7 +7,7 @@ export const getAdvancedModelSettingsProperties = (): NodeProperty[] => {
       name: "streaming",
       label: "Streaming",
       type: "boolean",
-      default: true,
+      default: false, //TODO: there is a bug where default true is not being respected, so set it to false to force user to manually turn it on. Will fix later.
       optional: true,
       description:
         "Whether to stream the response or not. If true, the response will be streamed to the client.",
