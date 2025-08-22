@@ -18,11 +18,12 @@ import {
   AgentToolApprovalItem,
   AgentToolCallItem,
   convertJsonSchemaToZodSchema,
+  ModelProviders,
   TriggerNodeNames,
 } from "common";
 import { CredentialData } from "../../credentials/crud/types.js";
 import { chatModelFactories } from "../llm/provider/index.js";
-import { AgentConfigurationsPropertyInput } from "../../workflow/node/properties/agent/agent.config.property.js";
+import { AgentConfigurationsPropertyInput } from "../../workflow/node/property/properties/agent/agent.config.property.js";
 import { AgentMemoryManager } from "./memory/types.js";
 import { AgentOutputs, CreateAgentOptions } from "./types.js";
 import { publishWorkflowNodeExecutionEvent } from "../../workflow/execution-engine/utils.js";
@@ -124,6 +125,8 @@ const createAgent = <
  * @param nodeId
  * @param inputs
  * @param credentials
+ * @param tools
+ * @param toolChoice
  */
 const createAgentFromNodeInputs = <
   TContext = UnknownContext,
@@ -131,16 +134,18 @@ const createAgentFromNodeInputs = <
 >({
   nodeId,
   credentials,
-  configurations,
+  inputs,
   tools,
   toolChoice,
 }: {
   nodeId: string;
   credentials: CredentialData[];
-  configurations: AgentConfigurationsPropertyInput;
+  inputs: AgentConfigurationsPropertyInput;
   tools?: Tool<TContext>[];
   toolChoice?: ModelSettingsToolChoice | undefined;
 }): Agent<TContext, TOutput> => {
+  const configurations = inputs.agent_configurations.llm_configurations;
+
   const getOutputStructure = () => {
     if (configurations.output_structure instanceof ZodObject) {
       return configurations.output_structure as AgentOutputType;
@@ -161,16 +166,18 @@ const createAgentFromNodeInputs = <
   return createAgent({
     name: nodeId,
     model: {
-      model: configurations[configurations.model_provider]?.model as string,
+      model:
+        (configurations.model_provider === "openrouter"
+          ? configurations.modelName
+          : configurations.model) || "",
       settings: {
-        ...configurations[configurations.model_provider],
+        ...configurations.advanced_settings,
         toolChoice,
         enableMemory: configurations.enable_memory,
-        enableStreaming:
-          configurations[configurations.model_provider]?.streaming,
+        enableStreaming: configurations.advanced_settings?.streaming,
       },
       provider: {
-        name: configurations.model_provider,
+        name: configurations.model_provider as ModelProviders,
         credential:
           credentials.find(
             (c) => c.credentialName === configurations.model_provider,
@@ -178,7 +185,6 @@ const createAgentFromNodeInputs = <
       },
     },
     instructions: configurations.instructions,
-    inputMessage: configurations.input_message,
     outputType: getOutputStructure(),
     tools,
   });

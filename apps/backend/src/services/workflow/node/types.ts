@@ -4,6 +4,8 @@ import {
   TriggerNodeNames,
   INodeExecutionError,
   AgentToolApprovalItem,
+  NodePropertyOption,
+  INodeProperty,
 } from "common";
 import { CredentialData } from "../../credentials/crud/types.js";
 import { DB } from "../../../database/init.js";
@@ -51,7 +53,14 @@ export type NodeExecutionOutput<
 export interface INodeVersion {
   description: NodeVersionDescription;
   execute(data: NodeExecutionInput): Promise<NodeExecutionOutput>;
-  loadMethods?: Record<string, () => Promise<void>>; // TODO: decide input/outputs for load methods
+  loadMethods?: Record<
+    string,
+    (inputs: Record<string, unknown>) => Promise<{
+      options?: NodePropertyOption[];
+      collection?: INodeProperty[];
+      credentialName?: string;
+    }>
+  >;
 }
 
 export interface IBaseNode {

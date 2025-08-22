@@ -11,6 +11,9 @@ import JsonSchemaInput from "../inputs/json-schema/JsonSchemaInput.tsx";
 import ArrayInput from "../inputs/ArrayInput.tsx";
 import MultiOptionsInput from "../inputs/MultiOptionsInput.tsx";
 import CredentialInput from "../inputs/CredentialInput.tsx";
+import GridInput from "../inputs/GridInput.tsx";
+import AsyncPropertyHandler from "./AsyncPropertyHandler.tsx";
+import AsyncCredentialHandler from "./AsyncCredentialHandler.tsx";
 
 const Properties: FC<{
   properties: INodeProperty[];
@@ -18,19 +21,25 @@ const Properties: FC<{
   propertyPath?: string;
   onInputChange?: (path: string, value: unknown) => void;
   selectedVersion?: WorkflowBuilderUINodeData["versions"][number];
+  nodeName?: string;
   onCredentialChange?: (
     credentialName: string,
     credentialId: string | null,
   ) => void;
   readOnly?: boolean;
+  breadcrumbTrail?: string[];
+  isLoading?: boolean;
 }> = ({
   properties,
   inputs,
   propertyPath,
   onInputChange,
   selectedVersion,
+  nodeName,
   onCredentialChange,
   readOnly = false,
+  breadcrumbTrail = [],
+  isLoading,
 }) => {
   return (
     <>
@@ -52,6 +61,7 @@ const Properties: FC<{
                 propertyPath={fullPath}
                 onInputChange={onInputChange}
                 readOnly={readOnly}
+                isLoading={isLoading}
               />
             );
           } else if (property.type === "multiOptions" && property.options) {
@@ -63,6 +73,7 @@ const Properties: FC<{
                 propertyPath={fullPath}
                 onInputChange={onInputChange}
                 readOnly={readOnly}
+                isLoading={isLoading}
               />
             );
           } else if (property.type === "string") {
@@ -150,8 +161,11 @@ const Properties: FC<{
                       propertyPath={fullPath}
                       onInputChange={onInputChange}
                       selectedVersion={selectedVersion}
+                      nodeName={nodeName}
                       onCredentialChange={onCredentialChange}
                       readOnly={readOnly}
+                      breadcrumbTrail={breadcrumbTrail}
+                      isLoading={isLoading}
                     />
                   </div>
                 </AccordionItem>
@@ -209,10 +223,66 @@ const Properties: FC<{
                   propertyPath={fullPath}
                   onInputChange={onInputChange}
                   selectedVersion={selectedVersion}
+                  nodeName={nodeName}
                   onCredentialChange={onCredentialChange}
                   readOnly={readOnly}
+                  breadcrumbTrail={breadcrumbTrail}
+                  isLoading={isLoading}
                 />
               </div>
+            );
+          } else if (
+            property.type === "grid" &&
+            Array.isArray(property.gridItems)
+          ) {
+            return (
+              <GridInput
+                key={property.name}
+                property={property}
+                inputs={inputs}
+                propertyPath={fullPath}
+                onInputChange={onInputChange}
+                readOnly={readOnly}
+                breadcrumbTrail={[...breadcrumbTrail, property.label]}
+                nodeName={nodeName}
+                isLoading={isLoading}
+                onCredentialChange={onCredentialChange}
+                selectedVersion={selectedVersion}
+              />
+            );
+          } else if (
+            (property.type === "asyncOptions" ||
+              property.type === "asyncPropertyCollection") &&
+            property.loadMethod
+          ) {
+            return (
+              <AsyncPropertyHandler
+                key={property.name}
+                property={property}
+                inputs={inputs}
+                propertyPath={fullPath}
+                onInputChange={onInputChange}
+                selectedVersion={selectedVersion}
+                nodeName={nodeName}
+                onCredentialChange={onCredentialChange}
+                readOnly={readOnly}
+                breadcrumbTrail={breadcrumbTrail}
+              />
+            );
+          } else if (
+            property.type === "asyncCredential" &&
+            property.loadMethod
+          ) {
+            return (
+              <AsyncCredentialHandler
+                key={property.name}
+                property={property}
+                inputs={inputs}
+                selectedVersion={selectedVersion}
+                nodeName={nodeName}
+                onCredentialChange={onCredentialChange}
+                readOnly={readOnly}
+              />
             );
           }
         })}

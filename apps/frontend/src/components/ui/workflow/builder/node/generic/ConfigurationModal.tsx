@@ -42,7 +42,7 @@ const motionProps = {
       },
     },
   },
-};
+} as const;
 
 const ConfigurationModal: FC<{
   openConfigurationModal: boolean;
@@ -88,7 +88,6 @@ const ConfigurationModal: FC<{
     }
   }, [selectedVersion]);
 
-  // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
       if (saveTimeoutRef.current) {
@@ -98,7 +97,6 @@ const ConfigurationModal: FC<{
   }, []);
 
   const handleVersionChange = (versionNumber: string) => {
-    // Save snapshot before making changes
     const nodeName = nodeData.friendlyName || nodeData.label || nodeId;
     saveSnapshot(`Changed version of "${nodeName}" to v${versionNumber}`);
 
@@ -124,7 +122,6 @@ const ConfigurationModal: FC<{
   };
 
   const handleFriendlyNameChange = (newFriendlyName: string) => {
-    // Save snapshot before making changes
     const oldName = nodeData.friendlyName || nodeData.label || nodeId;
     saveSnapshot(`Renamed "${oldName}" to "${newFriendlyName}"`);
 
@@ -339,6 +336,7 @@ const ConfigurationModal: FC<{
                       properties={selectedVersion.properties}
                       onInputChange={handleInputChange}
                       selectedVersion={selectedVersion}
+                      nodeName={nodeData.name}
                       onCredentialChange={handleCredentialChange}
                       readOnly={readOnly}
                     />

@@ -1,6 +1,6 @@
 import { z } from "zod/v4";
 import { z as zodv3 } from "zod";
-import { agentConfigurationsPropertyInputSchema } from "../../../../properties/agent/agent.config.property.js";
+import { agentConfigurationsPropertyInputSchema } from "../../../../property/properties/agent/agent.config.property.js";
 
 export const conditionSchema = z.object({
   id: z.string(),
@@ -13,16 +13,18 @@ export type Condition = z.infer<typeof conditionSchema>;
 export const nodePropertyInputSchema =
   agentConfigurationsPropertyInputSchema.extend({
     router_configurations: z.object({
-      conditions: z
-        .array(conditionSchema)
-        .nullish()
-        .transform((v) => v ?? [])
-        .pipe(z.array(conditionSchema).min(1)),
-      default_condition: z
-        .string()
-        .nullish()
-        .transform((v) => v ?? undefined)
-        .describe("ID of the default condition if no conditions match"),
+      routing_configurations: z.object({
+        conditions: z
+          .array(conditionSchema)
+          .nullish()
+          .transform((v) => v ?? [])
+          .pipe(z.array(conditionSchema).min(1)),
+        default_condition: z
+          .string()
+          .nullish()
+          .transform((v) => v ?? undefined)
+          .describe("ID of the default condition if no conditions match"),
+      }),
     }),
   });
 

@@ -1,7 +1,7 @@
 import { z } from "zod/v4";
 import { toolNames } from "./constants.js";
 import { supportedNetworks } from "../../../../../../blockchain/platform/oneinch/constants.js";
-import { agentConfigurationsPropertyInputSchema } from "../../../../properties/agent/agent.config.property.js";
+import { agentConfigurationsPropertyInputSchema } from "../../../../property/properties/agent/agent.config.property.js";
 
 const toolNamesSchema = z
   .array(z.enum(Array.from(toolNames.keys())), {

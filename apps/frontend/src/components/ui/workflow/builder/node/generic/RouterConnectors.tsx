@@ -36,10 +36,13 @@ const RouterConnectors: FC<RouterConnectorsProps> = ({
     );
     const inputs = currentVersion?.inputs as {
       router_configurations: {
-        conditions: { id: string; name: string; expression: string }[];
+        routing_configurations: {
+          conditions: { id: string; name: string; expression: string }[];
+        };
       };
     };
-    const conditions = inputs?.router_configurations?.conditions || [];
+    const conditions =
+      inputs?.router_configurations?.routing_configurations?.conditions || [];
     return { conditions };
   }, [nodeData.versions, nodeData.currentVersion]);
 

@@ -49,11 +49,21 @@ export interface INodeProperty {
   options?: NodePropertyOption[];
   hidden?: boolean;
   loadMethod?: string;
+  dependencies?: string[];
   default?: CommonPrimitiveTypes | CommonPrimitiveTypes[];
   collection?: INodeProperty[];
   isMultiline?: boolean;
   minNumber?: number;
   maxNumber?: number;
+  gridItems?: IGridItem[];
+}
+
+export interface IGridItem {
+  label: string;
+  name: string;
+  description?: string;
+  icon?: string;
+  collection?: INodeProperty[];
 }
 
 export type NodeProperty = z.infer<typeof nodePropertySchema>;

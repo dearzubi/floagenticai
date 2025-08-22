@@ -1,5 +1,9 @@
 import { z } from "zod/v4";
-import { nodeSerialisedSchema } from "common";
+import {
+  nodeSerialisedSchema,
+  nodePropertyOptionSchema,
+  nodePropertySchema,
+} from "common";
 
 export const allNodesListAPIResponseSchema = z.array(nodeSerialisedSchema);
 
@@ -103,3 +107,11 @@ export type ExportWorkflowAPIResponse = z.infer<
 export type ImportWorkflowAPIResponse = z.infer<
   typeof importWorkflowAPIResponseSchema
 >;
+
+export const loadMethodAPIResponseSchema = z.object({
+  options: z.array(nodePropertyOptionSchema).optional(),
+  collection: z.array(nodePropertySchema).optional(),
+  credentialName: z.string().optional(),
+});
+
+export type LoadMethodAPIResponse = z.infer<typeof loadMethodAPIResponseSchema>;

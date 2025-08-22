@@ -10,7 +10,15 @@ const MultiOptionsInput: FC<{
   propertyPath: string;
   onInputChange?: (path: string, value: unknown) => void;
   readOnly?: boolean;
-}> = ({ property, inputs, propertyPath, onInputChange, readOnly = false }) => {
+  isLoading?: boolean;
+}> = ({
+  property,
+  inputs,
+  propertyPath,
+  onInputChange,
+  readOnly = false,
+  isLoading,
+}) => {
   const currentValue = get(inputs, propertyPath) as string[] | undefined;
   const selectedKeys = new Set(currentValue || []);
   const totalOptions = property.options?.length || 0;
@@ -104,7 +112,7 @@ const MultiOptionsInput: FC<{
         onSelectionChange={handleSelectionChange}
         className="w-full"
         isRequired={!property.optional}
-        isDisabled={readOnly}
+        isDisabled={readOnly || isLoading}
         renderValue={renderValue}
         classNames={{
           trigger:
