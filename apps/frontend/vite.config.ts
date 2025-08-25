@@ -1,7 +1,7 @@
 /// <reference types="vitest/config" />
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
+import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import dotenv from "dotenv";
 
 const serverEnv = dotenv.config({
@@ -15,10 +15,13 @@ const serverPort = Number(serverEnv?.PORT) || 4000;
 export default defineConfig({
   plugins: [
     // Please make sure that '@tanstack/router-plugin' is passed before '@vitejs/plugin-react'
-    TanStackRouterVite({ target: "react", autoCodeSplitting: true }),
+    tanstackRouter({ target: "react", autoCodeSplitting: true }),
     react(),
   ],
   server: {
+    watch: {
+      usePolling: true,
+    },
     proxy: {
       "/api": {
         target: `http://localhost:${serverPort}`,

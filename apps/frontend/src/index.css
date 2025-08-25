@@ -122,3 +122,104 @@ button:focus-visible {
   table-layout: fixed;
   width: 100%;
 }
+
+/* MCP Servers page utilities */
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Smooth transitions for MCP cards */
+.mcp-card {
+  transition:
+    transform 0.2s ease-in-out,
+    box-shadow 0.2s ease-in-out;
+}
+
+.mcp-card:hover {
+  transform: translateY(-2px);
+}
+
+/* Gradient text utilities */
+.gradient-text {
+  background: linear-gradient(
+    135deg,
+    hsl(var(--heroui-primary)),
+    hsl(var(--heroui-secondary))
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Custom scrollbar for better UX */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: hsl(var(--heroui-default-300));
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--heroui-default-400));
+}
+
+/* Flexible height for MCP server cards with consistent spacing */
+.mcp-server-card {
+  min-height: 280px; /* Minimum height for consistency */
+  display: flex;
+  flex-direction: column;
+}
+
+.mcp-server-card .card-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.mcp-server-card .description {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-start;
+}
+
+.mcp-server-card .tools-section {
+  margin-top: auto;
+  padding-top: 12px;
+}
+
+/* Enhanced card hover effects */
+.mcp-server-card:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Modal content styling */
+.mcp-modal .modal-tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 8px;
+}
+
+/* Tooltip for truncated text */
+.truncated-text {
+  cursor: help;
+}
