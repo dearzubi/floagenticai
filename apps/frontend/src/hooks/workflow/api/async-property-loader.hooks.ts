@@ -29,6 +29,7 @@ export interface AsyncPropertyLoaderResult {
   error: Error | null;
   isBackgroundLoading: boolean;
   hasData: boolean;
+  refresh: () => void;
 }
 
 /**
@@ -122,5 +123,6 @@ export const useAsyncPropertyLoader = ({
     error: query.error,
     isBackgroundLoading,
     hasData: !!query.data,
+    refresh: () => query.refetch(),
   };
 };

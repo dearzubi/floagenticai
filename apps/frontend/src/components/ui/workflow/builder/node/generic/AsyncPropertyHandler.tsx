@@ -1,9 +1,12 @@
-import { Accordion, AccordionItem, Spinner } from "@heroui/react";
+import { Accordion, AccordionItem, Button } from "@heroui/react";
 import { FC } from "react";
 import { INodeProperty, WorkflowBuilderUINodeData } from "common";
 import { useAsyncPropertyLoader } from "../../../../../../hooks/workflow/api/async-property-loader.hooks.ts";
 import OptionsInput from "../inputs/OptionsInput.tsx";
+import MultiOptionsInput from "../inputs/MultiOptionsInput.tsx";
 import Properties from "./Properties.tsx";
+
+const defaultBreadcrumbTrail: string[] = [];
 
 const AsyncPropertyHandler: FC<{
   property: INodeProperty;
@@ -27,9 +30,9 @@ const AsyncPropertyHandler: FC<{
   nodeName,
   onCredentialChange,
   readOnly = false,
-  breadcrumbTrail = [],
+  breadcrumbTrail = defaultBreadcrumbTrail,
 }) => {
-  const { data, isLoading, isError, isBackgroundLoading, hasData } =
+  const { data, isLoading, isError, isBackgroundLoading, hasData, refresh } =
     useAsyncPropertyLoader({
       nodeName: nodeName || "",
       methodName: property.loadMethod || "",
@@ -51,7 +54,10 @@ const AsyncPropertyHandler: FC<{
       <div className="p-4 bg-danger-50 rounded-lg">
         <p className="text-danger-700 text-sm">
           Failed to load{" "}
-          {property.type === "asyncOptions" ? "options" : "collection"}
+          {property.type === "asyncOptions" ||
+          property.type === "asyncMultiOptions"
+            ? "options"
+            : "collection"}
         </p>
       </div>
     );
@@ -65,19 +71,49 @@ const AsyncPropertyHandler: FC<{
 
     return (
       <div className="relative">
-        {isBackgroundLoading && (
-          <div className="absolute top-2 right-2 z-10">
-            <Spinner size="sm" color="primary" />
-          </div>
+        <div className="flex-1">
+          <OptionsInput
+            property={propertyWithLoadedOptions}
+            inputs={inputs}
+            propertyPath={propertyPath}
+            onInputChange={onInputChange}
+            readOnly={readOnly}
+            isLoading={false}
+            asyncControls={{
+              refresh,
+              isBackgroundLoading,
+            }}
+          />
+        </div>
+        {isError && hasData && (
+          <p className="text-warning-600 text-xs mt-1">
+            Failed to refresh options - showing cached data
+          </p>
         )}
-        <OptionsInput
-          property={propertyWithLoadedOptions}
-          inputs={inputs}
-          propertyPath={propertyPath}
-          onInputChange={onInputChange}
-          readOnly={readOnly}
-          isLoading={false}
-        />
+      </div>
+    );
+  } else if (property.type === "asyncMultiOptions") {
+    const propertyWithLoadedOptions: INodeProperty = {
+      ...property,
+      options: data?.options || property.options,
+    };
+
+    return (
+      <div className="relative">
+        <div className="flex-1">
+          <MultiOptionsInput
+            property={propertyWithLoadedOptions}
+            inputs={inputs}
+            propertyPath={propertyPath}
+            onInputChange={onInputChange}
+            readOnly={readOnly}
+            isLoading={false}
+            asyncControls={{
+              refresh,
+              isBackgroundLoading,
+            }}
+          />
+        </div>
         {isError && hasData && (
           <p className="text-warning-600 text-xs mt-1">
             Failed to refresh options - showing cached data
@@ -99,7 +135,33 @@ const AsyncPropertyHandler: FC<{
             title={
               <div className="flex items-center justify-between w-full">
                 <span className="text-sm">{property.label}</span>
-                {isBackgroundLoading && <Spinner size="sm" color="primary" />}
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    variant="light"
+                    isIconOnly
+                    onPress={refresh}
+                    isLoading={isBackgroundLoading}
+                    className="min-w-6 h-6 hover:border-transparent focus:outline-none"
+                    title="Refresh collection"
+                  >
+                    {!isBackgroundLoading && (
+                      <svg
+                        className="w-3 h-3"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                        />
+                      </svg>
+                    )}
+                  </Button>
+                </div>
               </div>
             }
             classNames={{

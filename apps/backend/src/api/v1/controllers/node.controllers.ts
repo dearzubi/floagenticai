@@ -6,6 +6,8 @@ import {
 import { ValidationError } from "../../../utils/errors/validation.error.js";
 import { LoadMethodAPIRequestData } from "../schemas/node.schemas.js";
 import { NodeNames } from "common";
+import { User } from "../../../database/entities/user.entity.js";
+import { getDB } from "../../../database/init.js";
 
 /**
  * List all workflow nodes
@@ -55,7 +57,10 @@ export const loadMethodController = async (
       );
     }
 
-    const result = await loadMethod(inputs || {});
+    const result = await loadMethod(inputs, {
+      db: await getDB(),
+      user: req.user as User,
+    });
 
     res.json(result);
   } catch (error) {
