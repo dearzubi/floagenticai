@@ -29,7 +29,7 @@ import { JsonObject } from "@hatchet-dev/typescript-sdk/v1/types.js";
 import { workflowNodes } from "../../node/index.js";
 import { handleNodeExecutionError } from "../../node/utils.js";
 import { decryptData } from "../../../../utils/encryption.js";
-import { safeParseJSON } from "../../../../utils/misc.js";
+import { safeParseJSON } from "common";
 import { logger } from "../../../../utils/logger/index.js";
 import { createChatMessage } from "../../../chat/crud/index.js";
 import {
@@ -171,6 +171,7 @@ const executeNodes = async ({
       toolApprovalResults: nodeToolApprovalsResults?.get(nodeId),
       chatMessageId: chatMessageIds?.get(nodeId),
       db,
+      userId,
     });
 
     nodeExecutionPromises.push(nodeExecutionPromise);

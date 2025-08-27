@@ -96,20 +96,25 @@ export const getMCPCategories = (): MCPServerCategory[] => {
  * Get MCP installations for a user with MCP server info
  * @param db
  * @param userId
+ * @param withCredentialEncryptedData
  */
 export const getUserMCPInstallations = async ({
   db,
   userId,
+  withCredentialEncryptedData,
 }: {
   db: DB;
   userId: string;
+  withCredentialEncryptedData?: boolean;
 }): Promise<UserMCPInstallation[]> => {
   const installations = await db.find(
     MCPInstallation,
     { user: userId },
     {
       populate: ["credential"],
-      exclude: ["credential.encryptedData", "credential.user"],
+      exclude: withCredentialEncryptedData
+        ? ["credential.user"]
+        : ["credential.encryptedData", "credential.user"],
     },
   );
 
@@ -119,7 +124,7 @@ export const getUserMCPInstallations = async ({
       ...installation,
       serverInfo,
     };
-  });
+  }) as UserMCPInstallation[];
 };
 
 /**
@@ -213,7 +218,7 @@ export const getMCPInstallation = async ({
   return {
     ...installation,
     serverInfo,
-  };
+  } as UserMCPInstallation;
 };
 
 /**
@@ -233,7 +238,14 @@ export const updateMCPInstallation = async ({
   data: MCPInstallationUpdate;
   db: DB;
   user: User;
-}): Promise<Loaded<MCPInstallation, "credential", PopulatePath.ALL, "credential.encryptedData" | "credential.user">> => {
+}): Promise<
+  Loaded<
+    MCPInstallation,
+    "credential",
+    PopulatePath.ALL,
+    "credential.encryptedData" | "credential.user"
+  >
+> => {
   const installation = await db.findOne(
     MCPInstallation,
     { id: installationId, user: user.id },

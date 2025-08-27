@@ -45,6 +45,7 @@ export class AgentV1Node implements INodeVersion {
     sessionId,
     chatMessageId,
     db,
+    userId,
   }: NodeExecutionInput): Promise<NodeExecutionOutput<AgentOutputs>> {
     try {
       const userMessage = trigger.data["userMessage"] as string | undefined;
@@ -54,10 +55,12 @@ export class AgentV1Node implements INodeVersion {
         inputs,
       });
 
-      const agent = createAgentFromNodeInputs({
+      const agent = await createAgentFromNodeInputs({
         nodeId: id,
         credentials: credentials || [],
         inputs: validatedInputs,
+        db,
+        userId,
       });
 
       const nodeMemoryManager = creatNodeAgentMemoryManager({
@@ -80,7 +83,7 @@ export class AgentV1Node implements INodeVersion {
         ],
       });
 
-      const { finalOutput, structuredOutput } =
+      const { finalOutput, structuredOutput, artifacts, type } =
         await processAgenRunResultForNode({
           agent,
           runResult,
@@ -98,36 +101,13 @@ export class AgentV1Node implements INodeVersion {
         chatMessageId,
         success: true,
         outputs: {
-          type: "agent",
+          type,
           finalOutput,
           structuredOutput,
+          artifacts,
         },
       } satisfies NodeExecutionOutput<AgentOutputs>;
     } catch (error) {
-      // // TODO: this is a temp fix to the issue: https://github.com/openai/openai-agents-js/issues/176
-      // if (String(error).includes("Model did not") && finalOutput) {
-      //   await publishWorkflowNodeExecutionEvent({
-      //     type: "responded",
-      //     sessionId,
-      //     workflowId,
-      //     executionId,
-      //     triggerName: trigger.name,
-      //     nodeId: id,
-      //     data: {
-      //       content: finalOutput || "",
-      //     },
-      //   });
-      //   return {
-      //     nodeId: id,
-      //     friendlyName,
-      //     chatMessageId,
-      //     success: true,
-      //     outputs: {
-      //       finalOutput: finalOutput,
-      //     },
-      //   } satisfies NodeExecutionOutput;
-      // }
-      //TODO: UI should somehow display or at least alert user about the error, write now it just says Done and nothing shows
       return await handleNodeExecutionError({
         nodeId: id,
         workflowId,

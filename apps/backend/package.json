@@ -51,6 +51,7 @@
     "find-up": "^7.0.0",
     "firebase-admin": "^13.4.0",
     "flatted": "^3.3.3",
+    "linkup-mcp-server": "^1.1.0",
     "lodash-es": "^4.17.21",
     "morgan": "^1.10.0",
     "pg": "^8.15.6",

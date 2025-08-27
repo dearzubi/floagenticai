@@ -14,7 +14,7 @@ import {
   getWorkflowPubSubChannelName,
   WorkflowNodeExecutionEvent,
 } from "common";
-import { safeParseJSON } from "../../../../../utils/misc.js";
+import { safeParseJSON } from "common";
 import { redisSubscriptionManager } from "../../redis-subscription-manager.js";
 
 export const agentToolApprovalEvent = async (

@@ -27,6 +27,7 @@ export type NodeExecutionInput = {
   toolApprovalResults?: AgentToolApprovalItem[];
   chatMessageId?: string;
   db: DB;
+  userId?: string;
 };
 
 export type NodeSuccessExecutionOutput<

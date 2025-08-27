@@ -10,7 +10,7 @@ import {
   UpdateCredentialAPIRequestData,
 } from "../../../api/v1/schemas/credential.schemas.js";
 import { Credential } from "../../../database/entities/credential.entity.js";
-import { safeParseJSON } from "../../../utils/misc.js";
+import { safeParseJSON } from "common";
 import { CREDENTIAL_REDACTED_VALUE } from "./constants.js";
 import { processCredential } from "./util.js";
 import { CredentialData } from "./types.js";

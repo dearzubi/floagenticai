@@ -14,7 +14,7 @@ import {
   workflowSerialisedReactFlowSchema,
 } from "../schemas/workflow.schemas.js";
 import { WorkflowVersion } from "../../../database/entities/workflow-version.entity.js";
-import { safeParseJSON } from "../../../utils/misc.js";
+import { safeParseJSON } from "common";
 import { ValidationError } from "../../../utils/errors/validation.error.js";
 import { decryptData } from "../../../utils/encryption.js";
 
@@ -39,7 +39,8 @@ export const getWorkflowVersionsController = async (
   try {
     const user = req.user as User;
     const params = req.params as GetWorkflowVersionsAPIRequestData["params"];
-    const query = req.validatedQuery as GetWorkflowVersionsAPIRequestData["query"];
+    const query =
+      req.validatedQuery as GetWorkflowVersionsAPIRequestData["query"];
 
     const versions = await getWorkflowVersions(
       params.workflowId,

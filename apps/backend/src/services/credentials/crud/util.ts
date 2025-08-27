@@ -1,6 +1,6 @@
 import { Credential } from "../../../database/entities/credential.entity.js";
 import { decryptData } from "../../../utils/encryption.js";
-import { safeParseJSON } from "../../../utils/misc.js";
+import { safeParseJSON } from "common";
 import { CREDENTIAL_REDACTED_VALUE } from "./constants.js";
 import { logger } from "../../../utils/logger/index.js";
 import { ValidationError } from "../../../utils/errors/validation.error.js";

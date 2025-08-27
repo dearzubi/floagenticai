@@ -9,6 +9,7 @@ export const mcpServerCategories = z.enum([
   "Development Tools",
   "AI Services",
   "Productivity",
+  "Date and Time",
 ] as const);
 
 export type MCPServerCategory = z.infer<typeof mcpServerCategories>;

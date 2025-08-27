@@ -6,7 +6,7 @@ import {
   WorkflowBuilderUINodeData,
   WorkflowNodeExecutionEvent,
 } from "common";
-import { safeParseJSON } from "../../../utils/misc.js";
+import { safeParseJSON } from "common";
 import { workflowSerialisedReactFlowSchema } from "../../../api/v1/schemas/workflow.schemas.js";
 import { JsonObject } from "@hatchet-dev/typescript-sdk";
 import {

@@ -1,6 +1,11 @@
-import { IMCPServer } from "../../types.js";
-import { MCPServer, MCPServerStreamableHttp } from "@openai/agents";
+import { IMCPServer, MCPInitServerCtx } from "../../types.js";
+import { MCPServer, MCPServerStdio } from "@openai/agents";
 import { MCPServerCredentialNames } from "common";
+import { validateCredential } from "../../../../credentials/crud/util.js";
+import {
+  LinkupCredentials,
+  linkupCredentialsSchema,
+} from "../../../../credentials/credentials/linkup-credentials/schemas.js";
 
 export class LinkupMCPServer implements IMCPServer {
   description = {
@@ -10,15 +15,21 @@ export class LinkupMCPServer implements IMCPServer {
       "Connect your model to live web data via Linkup for real-time accuracy.",
     icon: "linkup-logo.svg",
     category: "Web Search" as const,
-    tools: ["search"],
+    tools: ["search-web"],
     credential: "linkup_credentials" satisfies MCPServerCredentialNames,
   };
 
-  async initServer(): Promise<MCPServer> {
-    const mcpServer = new MCPServerStreamableHttp({
-      url: "https://gitmcp.io/openai/codex",
-      name: "GitMCP Documentation Server",
+  async initServer(ctx: MCPInitServerCtx): Promise<MCPServer> {
+    const credential = validateCredential<LinkupCredentials>({
+      credential: ctx.credential,
+      schema: linkupCredentialsSchema,
     });
-    return Promise.resolve(mcpServer);
+
+    const mcpServer = new MCPServerStdio({
+      name: this.description.description,
+      fullCommand: `npx -y linkup-mcp-server --api-key=${credential.data.api_key}`,
+    });
+    await mcpServer.connect();
+    return mcpServer;
   }
 }

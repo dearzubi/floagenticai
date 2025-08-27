@@ -154,7 +154,7 @@ export class RouterAgentV1Node implements INodeVersion {
           };
       }
 
-      const agent = createAgentFromNodeInputs<
+      const agent = await createAgentFromNodeInputs<
         unknown,
         typeof outputStructureSchema
       >({

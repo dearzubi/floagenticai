@@ -1,7 +1,13 @@
 import { MCPServerDescription } from "common";
-import { MCPServer } from "@openai/agents";
+import { MCPServer, MCPToolFilterStatic } from "@openai/agents";
+import { CredentialData } from "../../credentials/crud/types.js";
+
+export type MCPInitServerCtx = {
+  credential?: CredentialData;
+  toolFilter?: MCPToolFilterStatic;
+};
 
 export interface IMCPServer {
   description: MCPServerDescription;
-  initServer(): Promise<MCPServer>;
+  initServer(ctx?: MCPInitServerCtx): Promise<MCPServer>;
 }

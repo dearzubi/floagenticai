@@ -15,6 +15,11 @@ export type GetMCPServersResponse = {
   categories: MCPServerCategory[];
 };
 
-export type UserMCPInstallation = Loaded<MCPInstallation, "credential", PopulatePath.ALL, "credential.encryptedData" | "credential.user"> & {
+export type UserMCPInstallation = Loaded<
+  MCPInstallation,
+  "credential",
+  PopulatePath.ALL,
+  "credential.user"
+> & {
   serverInfo?: MCPServerDescription;
 };
