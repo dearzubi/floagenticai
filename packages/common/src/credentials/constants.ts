@@ -12,6 +12,7 @@ export const mcpServerCredentialNames = [
   "linkup_credentials",
   "perplexity_credentials",
   "everart_credentials",
+  "brave_credentials",
 ] as const;
 
 export const credentialNames = [
