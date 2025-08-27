@@ -96,7 +96,7 @@ export const validateCredential = <T>({
   credential?: CredentialData;
   schema: ZodType;
 }): T => {
-  const parsed = schema.safeParse(credential);
+  const parsed = schema.safeParse(credential ?? {});
   if (!parsed.success) {
     throw parsed.error;
   }
