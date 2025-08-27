@@ -8,6 +8,7 @@ import { AnthropicCredentials } from "./anthropic-credentials/anthropic.credenti
 import { DeepseekCredentials } from "./deepseek-credentials/deepseek.credentials.js";
 import { OpenRouterCredentials } from "./openrouter-credentials/openrouter.credentials.js";
 import { LinkupCredentials } from "./linkup-credentials/linkup.credentials.js";
+import { PerplexityCredentials } from "./perplexity-credentials/linkup.credentials.js";
 
 export const nodeCredentials: Record<NodeCredentialNames, INodeCredential> = {
   openai: new OpenAICredentials(),
@@ -19,4 +20,5 @@ export const nodeCredentials: Record<NodeCredentialNames, INodeCredential> = {
   rpc_credentials: new RPCCredentials(),
   oneinch_credentials: new OneInchCredentials(),
   linkup_credentials: new LinkupCredentials(),
+  perplexity_credentials: new PerplexityCredentials(),
 };

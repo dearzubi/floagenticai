@@ -8,7 +8,10 @@ const modelProvidersCredentialNames = [
   "openrouter",
 ] satisfies ModelProviders[];
 
-export const mcpServerCredentialNames = ["linkup_credentials"] as const;
+export const mcpServerCredentialNames = [
+  "linkup_credentials",
+  "perplexity_credentials",
+] as const;
 
 export const credentialNames = [
   ...modelProvidersCredentialNames,
