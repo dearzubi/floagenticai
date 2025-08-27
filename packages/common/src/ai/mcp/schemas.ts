@@ -12,6 +12,7 @@ export const mcpServerCategories = z.enum([
   "Date and Time",
   "Image Generation",
   "Video Generation",
+  "Location",
 ] as const);
 
 export type MCPServerCategory = z.infer<typeof mcpServerCategories>;

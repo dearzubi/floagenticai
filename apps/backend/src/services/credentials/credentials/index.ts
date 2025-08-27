@@ -11,6 +11,7 @@ import { LinkupCredentials } from "./linkup-credentials/linkup.credentials.js";
 import { PerplexityCredentials } from "./perplexity-credentials/perplexity.credentials.js";
 import { EverArtCredentials } from "./everart-credentials/everart.credentials.js";
 import { BraveCredentials } from "./brave-credentials/brave.credentials.js";
+import { GoogleMapsCredentials } from "./google-maps-credentials/google.maps.credentials.js";
 
 export const nodeCredentials: Record<NodeCredentialNames, INodeCredential> = {
   openai: new OpenAICredentials(),
@@ -25,4 +26,5 @@ export const nodeCredentials: Record<NodeCredentialNames, INodeCredential> = {
   perplexity_credentials: new PerplexityCredentials(),
   everart_credentials: new EverArtCredentials(),
   brave_credentials: new BraveCredentials(),
+  google_maps_credentials: new GoogleMapsCredentials(),
 };

@@ -13,6 +13,7 @@ export const mcpServerCredentialNames = [
   "perplexity_credentials",
   "everart_credentials",
   "brave_credentials",
+  "google_maps_credentials",
 ] as const;
 
 export const credentialNames = [

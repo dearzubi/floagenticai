@@ -43,6 +43,7 @@
     "@mikro-orm/reflection": "^6.4.15",
     "@modelcontextprotocol/server-brave-search": "^0.6.2",
     "@modelcontextprotocol/server-everart": "^0.6.2",
+    "@modelcontextprotocol/server-google-maps": "^0.6.2",
     "@openai/agents": "^0.0.16",
     "@openai/agents-extensions": "^0.0.16",
     "@openrouter/ai-sdk-provider": "0.7.5",
