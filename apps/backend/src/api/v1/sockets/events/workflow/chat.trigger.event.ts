@@ -6,7 +6,7 @@ import {
 } from "../../types.js";
 import { logger } from "../../../../../utils/logger/index.js";
 import { Socket } from "socket.io";
-import { safeParseJSON } from "../../../../../utils/misc.js";
+import { safeParseJSON } from "common";
 import {
   extractNodeNameFromNodeId,
   getWorkflowPubSubChannelName,

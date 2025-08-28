@@ -123,6 +123,22 @@ const getAgentConfigurationsNodeProperty = (options?: {
           },
         ],
       },
+      {
+        name: "mcp_configurations",
+        label: "MCP Configurations",
+        icon: "lucide:server",
+        collection: [
+          {
+            name: "mcp_installations",
+            label: "MCP Installations",
+            type: "asyncMultiOptions",
+            loadMethod: "getUserMCPInstallations",
+            description:
+              "Select MCP installations to use with this agent. Only enabled installations will be appear here.",
+            optional: true,
+          },
+        ],
+      },
     ],
   };
 };
@@ -172,6 +188,14 @@ const agentConfigurationsPropertyInputSchema = z.object({
             : undefined,
         ),
     }),
+    mcp_configurations: z
+      .object({
+        mcp_installations: z
+          .array(z.string())
+          .nullish()
+          .transform((v) => (Array.isArray(v) ? v : [])),
+      })
+      .optional(),
   }),
 });
 

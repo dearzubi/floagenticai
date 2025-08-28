@@ -18,6 +18,7 @@ import { Route as LandingSigninRouteImport } from './routes/_landing/signin'
 import { Route as LandingMultiFactorVerificationRouteImport } from './routes/_landing/multi-factor-verification'
 import { Route as DashboardWorkflowsRouteImport } from './routes/_dashboard/workflows'
 import { Route as DashboardProfileRouteImport } from './routes/_dashboard/profile'
+import { Route as DashboardMcpServersRouteImport } from './routes/_dashboard/mcp-servers'
 import { Route as DashboardDashboardRouteImport } from './routes/_dashboard/dashboard'
 import { Route as DashboardCredentialsRouteImport } from './routes/_dashboard/credentials'
 import { Route as BuilderBuilderIndexRouteImport } from './routes/_builder/builder/index'
@@ -66,6 +67,11 @@ const DashboardProfileRoute = DashboardProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
+const DashboardMcpServersRoute = DashboardMcpServersRouteImport.update({
+  id: '/mcp-servers',
+  path: '/mcp-servers',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
 const DashboardDashboardRoute = DashboardDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -91,6 +97,7 @@ const BuilderBuilderWorkflowIdRoute =
 export interface FileRoutesByFullPath {
   '/credentials': typeof DashboardCredentialsRoute
   '/dashboard': typeof DashboardDashboardRoute
+  '/mcp-servers': typeof DashboardMcpServersRoute
   '/profile': typeof DashboardProfileRoute
   '/workflows': typeof DashboardWorkflowsRoute
   '/multi-factor-verification': typeof LandingMultiFactorVerificationRoute
@@ -103,6 +110,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/credentials': typeof DashboardCredentialsRoute
   '/dashboard': typeof DashboardDashboardRoute
+  '/mcp-servers': typeof DashboardMcpServersRoute
   '/profile': typeof DashboardProfileRoute
   '/workflows': typeof DashboardWorkflowsRoute
   '/multi-factor-verification': typeof LandingMultiFactorVerificationRoute
@@ -119,6 +127,7 @@ export interface FileRoutesById {
   '/_landing': typeof LandingRouteRouteWithChildren
   '/_dashboard/credentials': typeof DashboardCredentialsRoute
   '/_dashboard/dashboard': typeof DashboardDashboardRoute
+  '/_dashboard/mcp-servers': typeof DashboardMcpServersRoute
   '/_dashboard/profile': typeof DashboardProfileRoute
   '/_dashboard/workflows': typeof DashboardWorkflowsRoute
   '/_landing/multi-factor-verification': typeof LandingMultiFactorVerificationRoute
@@ -133,6 +142,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/credentials'
     | '/dashboard'
+    | '/mcp-servers'
     | '/profile'
     | '/workflows'
     | '/multi-factor-verification'
@@ -145,6 +155,7 @@ export interface FileRouteTypes {
   to:
     | '/credentials'
     | '/dashboard'
+    | '/mcp-servers'
     | '/profile'
     | '/workflows'
     | '/multi-factor-verification'
@@ -160,6 +171,7 @@ export interface FileRouteTypes {
     | '/_landing'
     | '/_dashboard/credentials'
     | '/_dashboard/dashboard'
+    | '/_dashboard/mcp-servers'
     | '/_dashboard/profile'
     | '/_dashboard/workflows'
     | '/_landing/multi-factor-verification'
@@ -241,6 +253,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardProfileRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
+    '/_dashboard/mcp-servers': {
+      id: '/_dashboard/mcp-servers'
+      path: '/mcp-servers'
+      fullPath: '/mcp-servers'
+      preLoaderRoute: typeof DashboardMcpServersRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
     '/_dashboard/dashboard': {
       id: '/_dashboard/dashboard'
       path: '/dashboard'
@@ -289,6 +308,7 @@ const BuilderRouteRouteWithChildren = BuilderRouteRoute._addFileChildren(
 interface DashboardRouteRouteChildren {
   DashboardCredentialsRoute: typeof DashboardCredentialsRoute
   DashboardDashboardRoute: typeof DashboardDashboardRoute
+  DashboardMcpServersRoute: typeof DashboardMcpServersRoute
   DashboardProfileRoute: typeof DashboardProfileRoute
   DashboardWorkflowsRoute: typeof DashboardWorkflowsRoute
 }
@@ -296,6 +316,7 @@ interface DashboardRouteRouteChildren {
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardCredentialsRoute: DashboardCredentialsRoute,
   DashboardDashboardRoute: DashboardDashboardRoute,
+  DashboardMcpServersRoute: DashboardMcpServersRoute,
   DashboardProfileRoute: DashboardProfileRoute,
   DashboardWorkflowsRoute: DashboardWorkflowsRoute,
 }

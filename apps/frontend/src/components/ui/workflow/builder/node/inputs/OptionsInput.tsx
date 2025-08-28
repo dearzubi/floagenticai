@@ -1,4 +1,4 @@
-import { Autocomplete, AutocompleteItem } from "@heroui/react";
+import { Autocomplete, AutocompleteItem, Button } from "@heroui/react";
 import { FC, useEffect, useRef } from "react";
 import { INodeProperty } from "common";
 import { getIconUrl } from "../../../../../../utils/misc.ts";
@@ -12,6 +12,10 @@ const OptionsInput: FC<{
   onInputChange?: (path: string, value: unknown) => void;
   readOnly?: boolean;
   isLoading?: boolean;
+  asyncControls?: {
+    isBackgroundLoading: boolean;
+    refresh: () => void;
+  };
 }> = ({
   property,
   inputs,
@@ -19,6 +23,7 @@ const OptionsInput: FC<{
   onInputChange,
   readOnly = false,
   isLoading,
+  asyncControls,
 }) => {
   const initialValue = getPropertyInputValue(
     inputs,
@@ -58,7 +63,40 @@ const OptionsInput: FC<{
 
   return (
     <div className="flex flex-col gap-2">
-      <Label property={property} />
+      <div className="flex items-center justify-between">
+        <Label property={property} />
+        {!readOnly && (
+          <div className="flex items-center gap-2">
+            {asyncControls && (
+              <Button
+                size="sm"
+                variant="light"
+                isIconOnly
+                onPress={() => asyncControls.refresh()}
+                isLoading={asyncControls.isBackgroundLoading}
+                className="min-w-8 h-8 hover:border-transparent focus:outline-none"
+                title="Refresh options"
+              >
+                {!asyncControls.isBackgroundLoading && (
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                    />
+                  </svg>
+                )}
+              </Button>
+            )}
+          </div>
+        )}
+      </div>
       <Autocomplete
         isLoading={isLoading}
         selectedKey={initialValue as string}

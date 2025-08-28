@@ -7,6 +7,11 @@ import { OneInchCredentials } from "./oneinch-credentials/oneinch.credentials.js
 import { AnthropicCredentials } from "./anthropic-credentials/anthropic.credentials.js";
 import { DeepseekCredentials } from "./deepseek-credentials/deepseek.credentials.js";
 import { OpenRouterCredentials } from "./openrouter-credentials/openrouter.credentials.js";
+import { LinkupCredentials } from "./linkup-credentials/linkup.credentials.js";
+import { PerplexityCredentials } from "./perplexity-credentials/perplexity.credentials.js";
+import { EverArtCredentials } from "./everart-credentials/everart.credentials.js";
+import { BraveCredentials } from "./brave-credentials/brave.credentials.js";
+import { GoogleMapsCredentials } from "./google-maps-credentials/google.maps.credentials.js";
 
 export const nodeCredentials: Record<NodeCredentialNames, INodeCredential> = {
   openai: new OpenAICredentials(),
@@ -17,4 +22,9 @@ export const nodeCredentials: Record<NodeCredentialNames, INodeCredential> = {
   evm_pk_credentials: new EVMPrivateKeyCredentials(),
   rpc_credentials: new RPCCredentials(),
   oneinch_credentials: new OneInchCredentials(),
+  linkup_credentials: new LinkupCredentials(),
+  perplexity_credentials: new PerplexityCredentials(),
+  everart_credentials: new EverArtCredentials(),
+  brave_credentials: new BraveCredentials(),
+  google_maps_credentials: new GoogleMapsCredentials(),
 };

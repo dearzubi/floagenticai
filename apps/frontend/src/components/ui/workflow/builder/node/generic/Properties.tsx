@@ -15,6 +15,8 @@ import GridInput from "../inputs/GridInput.tsx";
 import AsyncPropertyHandler from "./AsyncPropertyHandler.tsx";
 import AsyncCredentialHandler from "./AsyncCredentialHandler.tsx";
 
+const defaultBreadcrumbTrail: string[] = [];
+
 const Properties: FC<{
   properties: INodeProperty[];
   inputs: Record<string, unknown>;
@@ -38,7 +40,7 @@ const Properties: FC<{
   nodeName,
   onCredentialChange,
   readOnly = false,
-  breadcrumbTrail = [],
+  breadcrumbTrail = defaultBreadcrumbTrail,
   isLoading,
 }) => {
   return (
@@ -252,6 +254,7 @@ const Properties: FC<{
             );
           } else if (
             (property.type === "asyncOptions" ||
+              property.type === "asyncMultiOptions" ||
               property.type === "asyncPropertyCollection") &&
             property.loadMethod
           ) {

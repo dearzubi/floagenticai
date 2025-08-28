@@ -11,6 +11,8 @@ import {
   RunState,
   RunToolApprovalItem,
   AssistantMessageItem,
+  MCPServer,
+  createMCPToolStaticFilter,
 } from "@openai/agents";
 import { AiSdkModel } from "@openai/agents-extensions";
 import { ZodType } from "zod";
@@ -27,8 +29,14 @@ import { AgentConfigurationsPropertyInput } from "../../workflow/node/property/p
 import { AgentMemoryManager } from "./memory/types.js";
 import { AgentOutputs, CreateAgentOptions } from "./types.js";
 import { publishWorkflowNodeExecutionEvent } from "../../workflow/execution-engine/utils.js";
-import { safeParseJSON } from "../../../utils/misc.js";
+import { safeParseJSON } from "common";
 import { ZodObject } from "zod/v3";
+import { DB } from "../../../database/init.js";
+import { getUserMCPInstallations } from "../mcp/crud/index.js";
+import { processCredential } from "../../credentials/crud/util.js";
+import { Credential } from "../../../database/entities/credential.entity.js";
+import { mcpServers } from "../mcp/servers/index.js";
+import { IMCPServer } from "../mcp/types.js";
 
 const GENERIC_AGENT_INSTRUCTIONS =
   "You are an AI agent in the chain of multiple AI agents. When answering, make sure to minimise duplicate information from the previous agents (if available) in your response.\n";
@@ -109,6 +117,7 @@ const createAgent = <
     },
     outputType: finalOutputType,
     tools: options.tools,
+    mcpServers: options.mcpServers,
   });
 
   agent.configs = {
@@ -127,8 +136,10 @@ const createAgent = <
  * @param credentials
  * @param tools
  * @param toolChoice
+ * @param db
+ * @param userId
  */
-const createAgentFromNodeInputs = <
+const createAgentFromNodeInputs = async <
   TContext = UnknownContext,
   TOutput extends AgentOutputType = TextOutput,
 >({
@@ -137,13 +148,17 @@ const createAgentFromNodeInputs = <
   inputs,
   tools,
   toolChoice,
+  db,
+  userId,
 }: {
   nodeId: string;
   credentials: CredentialData[];
   inputs: AgentConfigurationsPropertyInput;
   tools?: Tool<TContext>[];
   toolChoice?: ModelSettingsToolChoice | undefined;
-}): Agent<TContext, TOutput> => {
+  db?: DB;
+  userId?: string;
+}): Promise<Agent<TContext, TOutput>> => {
   const configurations = inputs.agent_configurations.llm_configurations;
 
   const getOutputStructure = () => {
@@ -161,6 +176,51 @@ const createAgentFromNodeInputs = <
     }
 
     return "text";
+  };
+
+  const initMCPServers = async (): Promise<MCPServer[]> => {
+    const selectedMCPServers =
+      inputs.agent_configurations.mcp_configurations?.mcp_installations || [];
+    if (selectedMCPServers.length === 0 || !db || !userId) {
+      return [];
+    }
+
+    return await Promise.all(
+      (
+        await getUserMCPInstallations({
+          db,
+          userId,
+          withCredentialEncryptedData: true as const,
+        })
+      )
+        .filter(
+          (installation) =>
+            installation.status === "enabled" &&
+            selectedMCPServers.includes(installation.id) &&
+            mcpServers.has(installation.mcpServerName),
+        )
+        .map(async (installation) => {
+          let credentialData: CredentialData | undefined;
+          if (installation.credential) {
+            credentialData = processCredential(
+              installation.credential as Credential,
+              true,
+              true,
+            ) as CredentialData;
+          }
+
+          const mcpServerFactory = mcpServers.get(
+            installation.mcpServerName,
+          ) as IMCPServer;
+
+          return await mcpServerFactory.initServer({
+            credential: credentialData,
+            toolFilter: createMCPToolStaticFilter({
+              allowed: installation.selectedTools,
+            }),
+          });
+        }),
+    );
   };
 
   return createAgent({
@@ -187,6 +247,7 @@ const createAgentFromNodeInputs = <
     instructions: configurations.instructions,
     outputType: getOutputStructure(),
     tools,
+    mcpServers: await initMCPServers(),
   });
 };
 
@@ -462,7 +523,7 @@ const processAgenRunResultForNode = async <
     extractFunctionToolApprovalsFromAgentInterruptions();
 
   await Promise.all([
-    !disableEventPublishing && !runResult.toTextStream
+    !disableEventPublishing
       ? publishWorkflowNodeExecutionEvent({
           type: "responded",
           sessionId,
@@ -471,7 +532,7 @@ const processAgenRunResultForNode = async <
           triggerName,
           nodeId,
           data: {
-            content: finalOutput || "",
+            content: !runResult.toTextStream ? finalOutput : "",
             artifacts: {
               agentToolCalls,
               agentToolApprovals,

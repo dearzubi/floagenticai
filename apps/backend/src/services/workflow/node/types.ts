@@ -9,6 +9,7 @@ import {
 } from "common";
 import { CredentialData } from "../../credentials/crud/types.js";
 import { DB } from "../../../database/init.js";
+import { User } from "../../../database/entities/user.entity.js";
 
 export type NodeExecutionInput = {
   id: string;
@@ -26,6 +27,7 @@ export type NodeExecutionInput = {
   toolApprovalResults?: AgentToolApprovalItem[];
   chatMessageId?: string;
   db: DB;
+  userId?: string;
 };
 
 export type NodeSuccessExecutionOutput<
@@ -55,7 +57,10 @@ export interface INodeVersion {
   execute(data: NodeExecutionInput): Promise<NodeExecutionOutput>;
   loadMethods?: Record<
     string,
-    (inputs: Record<string, unknown>) => Promise<{
+    (
+      inputs: Record<string, unknown>,
+      context?: { db?: DB; user?: User },
+    ) => Promise<{
       options?: NodePropertyOption[];
       collection?: INodeProperty[];
       credentialName?: string;

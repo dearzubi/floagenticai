@@ -15,7 +15,7 @@ import {
   workflowSerialisedReactFlowSchema,
 } from "../schemas/workflow.schemas.js";
 import { Workflow } from "../../../database/entities/workflow.entity.js";
-import { safeParseJSON } from "../../../utils/misc.js";
+import { safeParseJSON } from "common";
 import { ValidationError } from "../../../utils/errors/validation.error.js";
 import { decryptData } from "../../../utils/encryption.js";
 

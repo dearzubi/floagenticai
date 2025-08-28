@@ -13,7 +13,7 @@ import {
   useDisclosure,
 } from "@heroui/react";
 import { getIconUrl } from "../../../../../../../../../utils/misc.ts";
-import { AgentToolCallItem } from "common";
+import { AgentToolCallItem, safeParseJSON } from "common";
 
 const ToolCallsArtifacts: FC<{
   agentToolCalls: AgentToolCallItem[];
@@ -110,7 +110,15 @@ const ToolCallsArtifacts: FC<{
                       </h4>
                       <div className="bg-default-100 rounded-lg p-3 overflow-hidden">
                         <p className="text-small text-default-800 whitespace-pre-wrap break-words">
-                          {selectedTool.toolOutput}
+                          {JSON.stringify(
+                            safeParseJSON(
+                              selectedTool?.toolOutput,
+                              undefined,
+                              selectedTool?.toolOutput,
+                            ),
+                            null,
+                            2,
+                          )}
                         </p>
                       </div>
                     </div>

@@ -1,6 +1,7 @@
 import { AiSdkModel } from "@openai/agents-extensions";
 import {
   AgentOutputType,
+  MCPServer,
   ModelSettings,
   Tool,
   UnknownContext,
@@ -25,6 +26,7 @@ export type CreateAgentOptions<TContext = UnknownContext> = {
   inputMessage?: string;
   outputType?: AgentOutputType;
   tools?: Tool<TContext>[];
+  mcpServers?: MCPServer[];
 };
 
 export type AgentOutputs<

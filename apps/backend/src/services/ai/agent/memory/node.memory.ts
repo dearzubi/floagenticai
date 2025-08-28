@@ -2,7 +2,7 @@ import { DB } from "../../../../database/init.js";
 import { AgentInputItem } from "@openai/agents";
 import { AgentMemory } from "../../../../database/entities/agent-memory.entity.js";
 import { decryptData, encryptData } from "../../../../utils/encryption.js";
-import { safeParseJSON } from "../../../../utils/misc.js";
+import { safeParseJSON } from "common";
 import { AgentMemoryManager } from "./types.js";
 
 /**

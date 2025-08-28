@@ -8,10 +8,11 @@ import { googleGenAIModels } from "../../../../ai/llm/provider/google.provider.j
 import { anthropicModels } from "../../../../ai/llm/provider/anthropic.provider.js";
 import { deepSeekModels } from "../../../../ai/llm/provider/deepseek.provider.js";
 import { getAdvancedModelSettingsProperties } from "../properties/agent/advanced.model.settings.properties.js";
+import { getUserMCPInstallations } from "../../../../ai/mcp/crud/index.js";
 
 export const agentLoadMethods: INodeVersion["loadMethods"] = {
   getModelProvidersList: async (
-    _inputs: Record<string, unknown>,
+    _inputs,
   ): Promise<{
     options?: NodePropertyOption[];
     collection?: INodeProperty[];
@@ -22,7 +23,7 @@ export const agentLoadMethods: INodeVersion["loadMethods"] = {
   },
 
   getModelsList: async (
-    inputs: Record<string, unknown>,
+    inputs,
   ): Promise<{
     options?: NodePropertyOption[];
     collection?: INodeProperty[];
@@ -49,7 +50,7 @@ export const agentLoadMethods: INodeVersion["loadMethods"] = {
   },
 
   getAdvancedModelSettings: async (
-    _inputs: Record<string, unknown>,
+    _inputs,
   ): Promise<{
     options?: NodePropertyOption[];
     collection?: INodeProperty[];
@@ -60,7 +61,7 @@ export const agentLoadMethods: INodeVersion["loadMethods"] = {
   },
 
   getModelProviderCredential: async (
-    inputs: Record<string, unknown>,
+    inputs,
   ): Promise<{
     options?: NodePropertyOption[];
     collection?: INodeProperty[];
@@ -86,6 +87,38 @@ export const agentLoadMethods: INodeVersion["loadMethods"] = {
         return { credentialName: "openrouter" };
       default:
         return {};
+    }
+  },
+
+  getUserMCPInstallations: async (
+    _inputs,
+    context,
+  ): Promise<{
+    options?: NodePropertyOption[];
+    collection?: INodeProperty[];
+  }> => {
+    if (!context?.user || !context.db) {
+      return { options: [] };
+    }
+
+    try {
+      const installations = await getUserMCPInstallations({
+        db: context.db,
+        userId: context.user.id,
+      });
+
+      const options: NodePropertyOption[] = installations
+        .filter((installation) => installation.status === "enabled")
+        .map((installation) => ({
+          name: installation.id,
+          label: installation.name,
+          description:
+            installation.description || installation.serverInfo?.description,
+        }));
+
+      return { options };
+    } catch {
+      return { options: [] };
     }
   },
 };
