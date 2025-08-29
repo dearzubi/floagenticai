@@ -1,5 +1,9 @@
 name: Deploy to VPS
 
+env:
+  CI: true
+  HUSKY: 0
+  
 on:
   workflow_dispatch:
     inputs:
