@@ -36,8 +36,8 @@ jobs:
       - name: Create deployment directory and clone repository
         run: |
           ssh ${{ vars.SSH_USER }}@${{ vars.SERVER_IP }} "
-            mkdir -p /srv/floagenticai
-            cd /srv/floagenticai
+            mkdir -p /srv/floagenticai/repo
+            cd /srv/floagenticai/repo
 
             # Clone or update repository
             if [ -d '.git' ]; then
@@ -59,7 +59,7 @@ jobs:
 
       - name: Create environment file
         run: |
-          ssh ${{ vars.SSH_USER }}@${{ vars.SERVER_IP }} "cat > /srv/floagenticai/.env << 'EOF'
+          ssh ${{ vars.SSH_USER }}@${{ vars.SERVER_IP }} "cat > /srv/floagenticai/repo/.env << 'EOF'
           # Application Configuration
           BACKEND_PORT=${{ vars.BACKEND_PORT || '4000' }}
           FRONTEND_PORT=${{ vars.FRONTEND_PORT || '3000' }}
@@ -114,7 +114,7 @@ jobs:
       - name: Stop existing services
         run: |
           ssh ${{ vars.SSH_USER }}@${{ vars.SERVER_IP }} "
-            cd /srv/floagenticai
+            cd /srv/floagenticai/repo
             if [ -f 'docker-compose.production.yml' ]; then
               echo 'Stopping existing services...'
               docker compose -f docker-compose.production.yml down || true
@@ -124,7 +124,7 @@ jobs:
       - name: Build and deploy services
         run: |
           ssh ${{ vars.SSH_USER }}@${{ vars.SERVER_IP }} "
-            cd /srv/floagenticai
+            cd /srv/floagenticai/repo
 
             BUILD_ARGS=''
             if [ '${{ inputs.force_rebuild }}' = 'true' ]; then
@@ -146,7 +146,7 @@ jobs:
       - name: Wait for health checks
         run: |
           ssh ${{ vars.SSH_USER }}@${{ vars.SERVER_IP }} "
-            cd /srv/floagenticai
+            cd /srv/floagenticai/repo
 
             echo 'Waiting for services to be healthy...'
             timeout 300 bash -c '
@@ -180,13 +180,13 @@ jobs:
       - name: Show deployment status
         run: |
           ssh ${{ vars.SSH_USER }}@${{ vars.SERVER_IP }} "
-            cd /srv/floagenticai
+            cd /srv/floagenticai/repo
             echo '=== Deployment Status ==='
             docker compose -f docker-compose.production.yml ps
 
             echo ''
             echo '=== Disk Usage ==='
-            df -h /srv/floagenticai
+            df -h /srv/floagenticai/repo
 
             echo ''
             echo '=== Docker Images ==='
