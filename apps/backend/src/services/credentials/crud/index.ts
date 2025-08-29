@@ -10,10 +10,10 @@ import {
   UpdateCredentialAPIRequestData,
 } from "../../../api/v1/schemas/credential.schemas.js";
 import { Credential } from "../../../database/entities/credential.entity.js";
-import { CredentialsObject } from "./types.js";
-import { safeParseJSON } from "../../../utils/misc.js";
+import { safeParseJSON } from "common";
 import { CREDENTIAL_REDACTED_VALUE } from "./constants.js";
 import { processCredential } from "./util.js";
+import { CredentialData } from "./types.js";
 
 /**
  * Creates a new credential and saves it to the database. The data is encrypted to ensure privacy.
@@ -25,7 +25,7 @@ import { processCredential } from "./util.js";
 export const createCredential = async (
   data: CreateCredentialAPIRequestData["body"],
   user: User,
-): Promise<CredentialsObject> => {
+): Promise<CredentialData<string>> => {
   const db = await getDB();
 
   const credential = db.create(Credential, {
@@ -59,7 +59,7 @@ export const createCredential = async (
  * @param {string} credentialId - The unique identifier of the credential.
  * @param {string} [userId] - An optional user ID to verify ownership of the credential.
  * @param {boolean} unRedacted - An optional flag to return unredacted credentials in plain text. (Be cautious)
- * @returns {Promise<CredentialsObject>} A promise that resolves to the credential object.
+ * @returns {Promise<CredentialData>} A promise that resolves to the credential object.
  * @throws {NotFoundError} If no credential with the specified ID is found.
  * @throws {ValidationError} If the credential data cannot be successfully decrypted.
  */
@@ -67,7 +67,7 @@ export const getCredential = async (
   credentialId: string,
   userId?: string,
   unRedacted?: boolean,
-): Promise<CredentialsObject> => {
+): Promise<CredentialData<string>> => {
   const db = await getDB();
 
   const where: FilterQuery<Credential> = userId
@@ -92,13 +92,13 @@ export const getCredential = async (
  *
  * @param {string} userId - The unique identifier of the user whose credentials are being retrieved.
  * @param {boolean} unRedacted - An optional flag to return unredacted credentials in plain text. (Be cautious)
- * @returns {Promise<CredentialsObject[]>} A promise that resolves to an array of CredentialsObject objects associated with the user.
+ * @returns {Promise<CredentialData[]>} A promise that resolves to an array of CredentialData objects associated with the user.
  */
 //TODO: Paginate response
 export const getCredentialList = async (
   userId: string,
   unRedacted?: boolean,
-): Promise<CredentialsObject[]> => {
+): Promise<CredentialData<string>[]> => {
   const db = await getDB();
 
   const credentials = await db.find(Credential, {
@@ -107,7 +107,7 @@ export const getCredentialList = async (
 
   return credentials
     .map((credential) => processCredential(credential, unRedacted, false))
-    .filter(Boolean) as CredentialsObject[];
+    .filter(Boolean) as CredentialData<string>[];
 };
 
 /**
@@ -115,12 +115,12 @@ export const getCredentialList = async (
  *
  * @param {string[]} credentialIds - List of credential IDs
  * @param {boolean} unRedacted - An optional flag to return unredacted credentials in plain text. (Be cautious)
- * @returns {Promise<CredentialsObject[]>} A promise that resolves to an array of CredentialsObject objects associated with the user.
+ * @returns {Promise<CredentialData[]>} A promise that resolves to an array of CredentialData objects associated with the user.
  */
 export const getCredentialListByIds = async (
   credentialIds: string[],
   unRedacted?: boolean,
-): Promise<CredentialsObject[]> => {
+): Promise<CredentialData<string>[]> => {
   if (!credentialIds.length) {
     return [];
   }
@@ -133,7 +133,7 @@ export const getCredentialListByIds = async (
 
   return credentials
     .map((credential) => processCredential(credential, unRedacted, false))
-    .filter(Boolean) as CredentialsObject[];
+    .filter(Boolean) as CredentialData<string>[];
 };
 
 /**
@@ -143,13 +143,13 @@ export const getCredentialListByIds = async (
  * @param {string} credentialNames - Comma-separated list of credentialName values to search for
  * @param {string} userId - The unique identifier of the user whose credentials are being retrieved
  * @param {boolean} unRedacted - An optional flag to return unredacted credentials in plain text. (Be cautious)
- * @returns {Promise<CredentialsObject[]>} A promise that resolves to an array of CredentialsObject objects matching the credentialNames
+ * @returns {Promise<CredentialData[]>} A promise that resolves to an array of CredentialData objects matching the credentialNames
  */
 export const getCredentialsByCredentialNames = async (
   credentialNames: string,
   userId: string,
   unRedacted?: boolean,
-): Promise<CredentialsObject[]> => {
+): Promise<CredentialData<string>[]> => {
   const db = await getDB();
 
   // Parse comma-separated credentialNames and trim whitespace
@@ -169,7 +169,7 @@ export const getCredentialsByCredentialNames = async (
 
   return credentials
     .map((credential) => processCredential(credential, unRedacted, false))
-    .filter(Boolean) as CredentialsObject[];
+    .filter(Boolean) as CredentialData<string>[];
 };
 
 /**
@@ -178,14 +178,14 @@ export const getCredentialsByCredentialNames = async (
  * @param {string} credentialId - The unique identifier of the credential to be updated.
  * @param {UpdateCredentialAPIRequestData["body"]} data - Contains the updated values for the credential including name and data fields.
  * @param {User} user - The user entity associated with the credential.
- * @returns {Promise<CredentialsObject>} A promise that resolves to the updated credential object.
+ * @returns {Promise<CredentialData>} A promise that resolves to the updated credential object.
  * @throws {NotFoundError} If the credential with the specified ID is not found or the requesting user does not have the necessary permissions to access it.
  */
 export const updateCredential = async (
   credentialId: string,
   data: UpdateCredentialAPIRequestData["body"],
   user: User,
-): Promise<CredentialsObject> => {
+): Promise<CredentialData<string>> => {
   const db = await getDB();
 
   return await db.transactional(async (em) => {

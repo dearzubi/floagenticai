@@ -6,7 +6,7 @@ import {
 } from "../../types.js";
 import { logger } from "../../../../../utils/logger/index.js";
 import { Socket } from "socket.io";
-import { safeParseJSON } from "../../../../../utils/misc.js";
+import { safeParseJSON } from "common";
 import {
   extractNodeNameFromNodeId,
   getWorkflowPubSubChannelName,
@@ -34,7 +34,7 @@ export const chatTriggerEvent = async (
   try {
     logger.info(`Executing chat trigger for workflow: ${data.workflowId}`);
 
-    // TODO: Sanitise user message??
+    // TODO: What to sanitize here and how?
     const userMessage = data.userMessage;
 
     const persistedUserMessage = await createChatMessage(

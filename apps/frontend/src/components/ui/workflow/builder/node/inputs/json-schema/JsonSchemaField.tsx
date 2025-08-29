@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useState, useCallback, useEffect } from "react";
 import { JsonSchemaFieldType, JsonSchemaType } from "./types";
 import { Button, Input, Select, SelectItem } from "@heroui/react";
 import { Icon } from "@iconify/react";
@@ -11,12 +11,35 @@ const JsonSchemaField: FC<{
   onRemoveField: (id: string) => void;
   readOnly?: boolean;
 }> = ({ field, onFieldChange, onRemoveField, readOnly = false }) => {
+  const [localName, setLocalName] = useState(field.name);
+  const [localDescription, setLocalDescription] = useState(field.description);
+
+  useEffect(() => {
+    setLocalName(field.name);
+  }, [field.name]);
+
+  useEffect(() => {
+    setLocalDescription(field.description);
+  }, [field.description]);
+
   const handleInputChange = <K extends keyof JsonSchemaFieldType>(
     key: K,
     value: JsonSchemaFieldType[K],
   ) => {
     onFieldChange({ ...field, [key]: value });
   };
+
+  const handleNameBlur = useCallback(() => {
+    if (localName !== field.name) {
+      handleInputChange("name", localName);
+    }
+  }, [localName, field.name]);
+
+  const handleDescriptionBlur = useCallback(() => {
+    if (localDescription !== field.description) {
+      handleInputChange("description", localDescription);
+    }
+  }, [localDescription, field.description]);
 
   const handleNestedFieldChange = (
     nestedField: JsonSchemaFieldType,
@@ -93,14 +116,14 @@ const JsonSchemaField: FC<{
       <div className="grid grid-cols-12 gap-3 items-center">
         <Input
           label="Field Name"
-          value={field.name}
-          onChange={
-            readOnly
-              ? undefined
-              : (e) => handleInputChange("name", e.target.value)
-          }
+          value={localName}
+          onChange={readOnly ? undefined : (e) => setLocalName(e.target.value)}
+          onBlur={readOnly ? undefined : handleNameBlur}
           className="col-span-4"
           isReadOnly={readOnly}
+          classNames={{
+            input: "focus:outline-none focus:ring-0 focus:ring-offset-0 ",
+          }}
         />
         <Select
           label="Type"
@@ -126,14 +149,16 @@ const JsonSchemaField: FC<{
         </Select>
         <Input
           label="Description"
-          value={field.description}
+          value={localDescription}
           onChange={
-            readOnly
-              ? undefined
-              : (e) => handleInputChange("description", e.target.value)
+            readOnly ? undefined : (e) => setLocalDescription(e.target.value)
           }
+          onBlur={readOnly ? undefined : handleDescriptionBlur}
           className="col-span-4"
           isReadOnly={readOnly}
+          classNames={{
+            input: "focus:outline-none focus:ring-0 focus:ring-offset-0 ",
+          }}
         />
         {!readOnly && (
           <Button
@@ -183,6 +208,12 @@ const JsonSchemaField: FC<{
                     handleArrayItemTypeChange(e.target.value as JsonSchemaType)
             }
             isDisabled={readOnly}
+            classNames={{
+              trigger:
+                "focus:outline-none focus-visible:outline-none " +
+                "ring-0 ring-offset-0 focus:ring-0 focus:ring-offset-0 " +
+                "bg-default-100 hover:bg-default-200 border-none transition-colors",
+            }}
           >
             <SelectItem key="string">String</SelectItem>
             <SelectItem key="number">Number</SelectItem>

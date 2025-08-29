@@ -1,5 +1,12 @@
-import { FC, PropsWithChildren } from "react";
-import { Handle, Position } from "@xyflow/react";
+import {
+  FC,
+  PropsWithChildren,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
+import { Handle, Position, useUpdateNodeInternals } from "@xyflow/react";
 import { Icon } from "@iconify/react";
 import { WorkflowBuilderUINodeData } from "common";
 import { Tooltip } from "@heroui/react";
@@ -9,39 +16,86 @@ interface RouterConnectorsProps extends PropsWithChildren {
   nodeData: WorkflowBuilderUINodeData;
 }
 
+const HANDLE_SIZE = 20; // px – diameter of a circular handle
+const HANDLE_GAP = 8; // px – desired vertical gap between handles
+// Minimum content height (matches approx Info card height)
+const MIN_NODE_HEIGHT = 60; // px
+
 const RouterConnectors: FC<RouterConnectorsProps> = ({
   children,
   color,
   nodeData,
 }) => {
-  // Get conditions from the current version's inputs
-  const currentVersion = nodeData.versions.find(
-    (v) => v.version === nodeData.currentVersion,
-  );
-  const conditions =
-    (currentVersion?.inputs?.conditions as Array<{
-      id: string;
-      name: string;
-      expression: string;
-    }>) || [];
+  const updateNodeInternals = useUpdateNodeInternals();
+  const prevConditionsRef = useRef<typeof conditions>([]);
+  const prevConditionIdsRef = useRef<string[]>([]);
 
-  // Dynamically enlarge node height so handles never overlap and distribute handles evenly.
-  const HANDLE_SIZE = 20; // px – diameter of a circular handle
-  const HANDLE_GAP = 8; // px – desired vertical gap between handles
+  const { conditions } = useMemo(() => {
+    const currentVersion = nodeData.versions.find(
+      (v) => v.version === nodeData.currentVersion,
+    );
+    const inputs = currentVersion?.inputs as {
+      router_configurations: {
+        routing_configurations: {
+          conditions: { id: string; name: string; expression: string }[];
+        };
+      };
+    };
+    const conditions =
+      inputs?.router_configurations?.routing_configurations?.conditions || [];
+    return { conditions };
+  }, [nodeData.versions, nodeData.currentVersion]);
 
-  // Minimum content height (matches approx Info card height)
-  const MIN_NODE_HEIGHT = 60; // px
+  const requiredHeight = useMemo(() => {
+    return Math.max(
+      MIN_NODE_HEIGHT,
+      conditions.length * (HANDLE_SIZE + HANDLE_GAP) + HANDLE_GAP,
+    );
+  }, [conditions.length]);
 
-  // Height needed to host all handles without overlap
-  const requiredHeight = Math.max(
-    MIN_NODE_HEIGHT,
-    conditions.length * (HANDLE_SIZE + HANDLE_GAP) + HANDLE_GAP,
-  );
-
-  // Evenly spaced handle positions in % based on requiredHeight
-  const getHandlePosition = (index: number, total: number) => {
+  const getHandlePosition = useCallback((index: number, total: number) => {
     return ((index + 1) * 100) / (total + 1);
-  };
+  }, []);
+
+  const conditionsChanged = useMemo(() => {
+    const changed =
+      JSON.stringify(conditions) !== JSON.stringify(prevConditionsRef.current);
+    if (changed) {
+      prevConditionsRef.current = conditions;
+    }
+    return changed;
+  }, [conditions]);
+
+  const conditionIdsChanged = useMemo(() => {
+    const currentIds = conditions.map((c) => c.id);
+    const prevIds = prevConditionIdsRef.current;
+
+    const idsChanged =
+      currentIds.length !== prevIds.length ||
+      currentIds.some((id, index) => id !== prevIds[index]);
+
+    if (idsChanged) {
+      prevConditionIdsRef.current = currentIds;
+    }
+
+    return idsChanged;
+  }, [conditions]);
+
+  useEffect(() => {
+    if (
+      conditionsChanged ||
+      conditions.length !== prevConditionsRef.current.length ||
+      conditionIdsChanged
+    ) {
+      updateNodeInternals(nodeData.id);
+    }
+  }, [
+    conditionsChanged,
+    conditions.length,
+    conditionIdsChanged,
+    nodeData.id,
+    updateNodeInternals,
+  ]);
 
   return (
     <div className={"flex"}>

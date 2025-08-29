@@ -6,7 +6,7 @@ import {
   ClearWorkflowChatAPIRequestData,
   DeleteChatMessageAPIRequestData,
 } from "../schemas/chat.schemas.js";
-import { safeParseJSON } from "../../../utils/misc.js";
+import { safeParseJSON } from "common";
 import { z } from "zod/v4";
 import { AgentArtifacts } from "common";
 

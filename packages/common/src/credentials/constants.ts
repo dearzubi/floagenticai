@@ -1,6 +1,24 @@
+import { ModelProviders } from "../ai/types.js";
+
+const modelProvidersCredentialNames = [
+  "openai",
+  "google_gen_ai",
+  "anthropic",
+  "deepseek",
+  "openrouter",
+] satisfies ModelProviders[];
+
+export const mcpServerCredentialNames = [
+  "linkup_credentials",
+  "perplexity_credentials",
+  "everart_credentials",
+  "brave_credentials",
+  "google_maps_credentials",
+] as const;
+
 export const credentialNames = [
-  "open_ai_credentials",
-  "google_ai_credentials",
+  ...modelProvidersCredentialNames,
+  ...mcpServerCredentialNames,
   "evm_pk_credentials",
   "rpc_credentials",
   "oneinch_credentials",

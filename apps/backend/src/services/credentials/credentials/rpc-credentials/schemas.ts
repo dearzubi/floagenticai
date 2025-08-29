@@ -11,12 +11,15 @@ export const providers = new Map<RPCProviders, string>([
 ]);
 
 export const rpcCredentialsSchema = z.object({
-  name: z.literal("rpc_credentials"),
-  data: z.object({
-    rpc_provider: z.enum(Array.from(providers.keys())),
-    api_key: z.string().nonempty(),
-    quicknode_endpoint_name: z.string().optional(),
-  }),
+  credentialName: z.literal("rpc_credentials"),
+  data: z.object(
+    {
+      rpc_provider: z.enum(Array.from(providers.keys())),
+      api_key: z.string().nonempty(),
+      quicknode_endpoint_name: z.string().optional(),
+    },
+    { error: "Please provide your RPC provider and API key." },
+  ),
 });
 
-export type RPCCredentials = z.infer<typeof rpcCredentialsSchema>;
+export type RPCCredentialsData = z.infer<typeof rpcCredentialsSchema>;

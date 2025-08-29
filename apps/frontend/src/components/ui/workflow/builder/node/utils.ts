@@ -54,6 +54,17 @@ const initialisePropertyInputs = (
       inputs[property.name] = initialisePropertyInputs(property.collection, {});
     } else if (property.type === "array" && property.collection) {
       inputs[property.name] = [];
+    } else if (property.type === "grid" && property.gridItems) {
+      inputs[property.name] = {};
+      for (const gridItem of property.gridItems) {
+        if (gridItem.collection) {
+          (inputs[property.name] as Record<string, unknown>)[gridItem.name] =
+            initialisePropertyInputs(gridItem.collection, {});
+        } else {
+          (inputs[property.name] as Record<string, unknown>)[gridItem.name] =
+            null;
+        }
+      }
     } else {
       // Ensure all properties are initialised either with default or null,
       // and it will be preserved when serialised to JSON for API request
@@ -615,8 +626,8 @@ export const getPropertyInputValue = <T>(
 
   if (
     typeof inputValue === "undefined" ||
-    inputValue === null ||
-    typeof inputValue === "object"
+    inputValue === null
+    // typeof inputValue === "object" //TODO: why the heck was it here?
   ) {
     return _default as T;
   }

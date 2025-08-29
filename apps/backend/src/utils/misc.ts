@@ -1,7 +1,6 @@
 import { findUpSync } from "find-up";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
-import { z } from "zod/v4";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -63,49 +62,6 @@ export const stringifyCircularJSON = (
   );
 };
 
-/**
- * Safely parses a JSON string into a JavaScript object.
- *
- * This utility function attempts to parse a JSON string and return the resulting object.
- * In case of a parsing error, it returns a fallback value to prevent the application
- * from throwing an exception. By default, the fallback value is null.
- * It can also optionally validate the parsed object against a Zod schema.
- *
- * @param {string} jsonString - The JSON string to be parsed.
- * @param {z.ZodType} schema - An optional Zod schema to validate the parsed object. Default: `undefined`
- * @param {Record<string, unknown>} [returnValueOnError={}] - The default fallback value
- * to return if parsing fails. Defaults to an empty object.
- * @returns {Record<string, unknown>} The parsed JavaScript object if the JSON string is valid;
- * otherwise, the provided `returnValueOnError` value.
- */
-export const safeParseJSON = <
-  T = unknown,
-  F extends
-    | Record<string, unknown>
-    | null
-    | undefined
-    | string
-    | number
-    | boolean = null,
->(
-  jsonString: string | null | undefined,
-  schema?: z.ZodType<T>,
-  returnValueOnError: F = null as F,
-): T | F => {
-  if (!jsonString) {
-    return returnValueOnError;
-  }
-  try {
-    const parsed = JSON.parse(jsonString) as T;
-    if (!schema) {
-      return parsed;
-    }
-    return schema.parse(parsed) as T;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (_error) {
-    return returnValueOnError;
-  }
-};
 /**
  * Pauses the execution of asynchronous operations for a specified duration.
  *

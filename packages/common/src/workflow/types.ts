@@ -49,12 +49,21 @@ export interface INodeProperty {
   options?: NodePropertyOption[];
   hidden?: boolean;
   loadMethod?: string;
+  dependencies?: string[];
   default?: CommonPrimitiveTypes | CommonPrimitiveTypes[];
   collection?: INodeProperty[];
-  embeddedCredentials?: NodeCredentialDescription[];
   isMultiline?: boolean;
   minNumber?: number;
   maxNumber?: number;
+  gridItems?: IGridItem[];
+}
+
+export interface IGridItem {
+  label: string;
+  name: string;
+  description?: string;
+  icon?: string;
+  collection?: INodeProperty[];
 }
 
 export type NodeProperty = z.infer<typeof nodePropertySchema>;
@@ -80,12 +89,12 @@ export type WorkflowBuilderUINodeData = NodeBaseDescription & {
   })[];
 };
 
-type WorkflowBaseEvent = {
+interface WorkflowBaseEvent {
   executionId: string;
   sessionId: string;
   workflowId: string;
   triggerName: TriggerNodeNames;
-};
+}
 
 type WorkflowNodeBaseEvent = WorkflowBaseEvent & {
   nodeId: string;
@@ -99,16 +108,16 @@ export type WorkflowNodeExecutionCompletedEvent = WorkflowNodeBaseEvent & {
   type: "completed";
 };
 
-export type AgentToolCallItem = {
+export interface AgentToolCallItem {
   toolName: string;
   toolInput: Record<string, unknown>;
   toolOutput: string;
   toolIcon?: string | null;
-};
+}
 
 export type AgentToolApprovalActionStatus = "pending" | "approved" | "rejected";
 
-export type AgentToolApprovalItem = {
+export interface AgentToolApprovalItem {
   arguments: string;
   callId: string;
   id?: string;
@@ -118,12 +127,12 @@ export type AgentToolApprovalItem = {
   type: "function_call";
   actionStatus: AgentToolApprovalActionStatus;
   nodeId: string;
-};
+}
 
-export type AgentArtifacts = {
+export interface AgentArtifacts {
   agentToolCalls?: AgentToolCallItem[];
   agentToolApprovals?: AgentToolApprovalItem[];
-};
+}
 
 export type WorkflowNodeExecutionRespondedEvent<
   T extends Record<string, unknown> = Record<string, unknown>,

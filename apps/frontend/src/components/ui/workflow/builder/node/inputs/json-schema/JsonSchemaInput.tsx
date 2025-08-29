@@ -6,6 +6,7 @@ import { Draft07Schema, JsonSchemaFieldType } from "./types";
 import { draft07ToFields, generateDraft07Schema } from "./utils";
 import JsonSchemaField from "./JsonSchemaField";
 import Label from "../Label";
+import { getPropertyInputValue } from "../../utils.ts";
 
 const JsonSchemaInput: FC<{
   property: INodeProperty;
@@ -17,16 +18,16 @@ const JsonSchemaInput: FC<{
   const [fields, setFields] = useState<JsonSchemaFieldType[]>([]);
 
   useEffect(() => {
-    if (fields.length) {
-      return;
-    }
+    const initialValue = getPropertyInputValue(inputs, propertyPath, undefined);
 
-    const raw = inputs[property.name];
-
-    if (Array.isArray(raw)) {
-      setFields(raw as JsonSchemaFieldType[]);
-    } else if (raw && typeof raw === "object" && "properties" in raw) {
-      setFields(draft07ToFields(raw as Draft07Schema));
+    if (Array.isArray(initialValue)) {
+      setFields(initialValue as JsonSchemaFieldType[]);
+    } else if (
+      initialValue &&
+      typeof initialValue === "object" &&
+      "properties" in initialValue
+    ) {
+      setFields(draft07ToFields(initialValue as Draft07Schema));
     }
   }, [inputs, property.name]);
 

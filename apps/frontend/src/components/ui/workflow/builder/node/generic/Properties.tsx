@@ -11,6 +11,11 @@ import JsonSchemaInput from "../inputs/json-schema/JsonSchemaInput.tsx";
 import ArrayInput from "../inputs/ArrayInput.tsx";
 import MultiOptionsInput from "../inputs/MultiOptionsInput.tsx";
 import CredentialInput from "../inputs/CredentialInput.tsx";
+import GridInput from "../inputs/GridInput.tsx";
+import AsyncPropertyHandler from "./AsyncPropertyHandler.tsx";
+import AsyncCredentialHandler from "./AsyncCredentialHandler.tsx";
+
+const defaultBreadcrumbTrail: string[] = [];
 
 const Properties: FC<{
   properties: INodeProperty[];
@@ -18,19 +23,25 @@ const Properties: FC<{
   propertyPath?: string;
   onInputChange?: (path: string, value: unknown) => void;
   selectedVersion?: WorkflowBuilderUINodeData["versions"][number];
+  nodeName?: string;
   onCredentialChange?: (
     credentialName: string,
     credentialId: string | null,
   ) => void;
   readOnly?: boolean;
+  breadcrumbTrail?: string[];
+  isLoading?: boolean;
 }> = ({
   properties,
   inputs,
   propertyPath,
   onInputChange,
   selectedVersion,
+  nodeName,
   onCredentialChange,
   readOnly = false,
+  breadcrumbTrail = defaultBreadcrumbTrail,
+  isLoading,
 }) => {
   return (
     <>
@@ -52,6 +63,7 @@ const Properties: FC<{
                 propertyPath={fullPath}
                 onInputChange={onInputChange}
                 readOnly={readOnly}
+                isLoading={isLoading}
               />
             );
           } else if (property.type === "multiOptions" && property.options) {
@@ -63,6 +75,7 @@ const Properties: FC<{
                 propertyPath={fullPath}
                 onInputChange={onInputChange}
                 readOnly={readOnly}
+                isLoading={isLoading}
               />
             );
           } else if (property.type === "string") {
@@ -125,7 +138,7 @@ const Properties: FC<{
             );
           } else if (
             property.type === "propertyCollection" &&
-            property.collection
+            Array.isArray(property.collection)
           ) {
             return (
               <Accordion
@@ -150,14 +163,20 @@ const Properties: FC<{
                       propertyPath={fullPath}
                       onInputChange={onInputChange}
                       selectedVersion={selectedVersion}
+                      nodeName={nodeName}
                       onCredentialChange={onCredentialChange}
                       readOnly={readOnly}
+                      breadcrumbTrail={breadcrumbTrail}
+                      isLoading={isLoading}
                     />
                   </div>
                 </AccordionItem>
               </Accordion>
             );
-          } else if (property.type === "array" && property.collection) {
+          } else if (
+            property.type === "array" &&
+            Array.isArray(property.collection)
+          ) {
             return (
               <ArrayInput
                 key={property.name}
@@ -183,6 +202,88 @@ const Properties: FC<{
                 onCredentialChange={(credentialId) =>
                   onCredentialChange?.(property.name, credentialId)
                 }
+                readOnly={readOnly}
+              />
+            );
+          } else if (
+            property.type === "section" &&
+            Array.isArray(property.collection)
+          ) {
+            return (
+              <div
+                key={property.name}
+                className={
+                  "flex flex-col gap-4 border border-default-100 rounded p-2 shadow-sm"
+                }
+              >
+                <h3 className=" text-lg font-semibold text-default-800">
+                  {property.label}
+                </h3>
+                <Properties
+                  properties={property.collection}
+                  inputs={inputs}
+                  propertyPath={fullPath}
+                  onInputChange={onInputChange}
+                  selectedVersion={selectedVersion}
+                  nodeName={nodeName}
+                  onCredentialChange={onCredentialChange}
+                  readOnly={readOnly}
+                  breadcrumbTrail={breadcrumbTrail}
+                  isLoading={isLoading}
+                />
+              </div>
+            );
+          } else if (
+            property.type === "grid" &&
+            Array.isArray(property.gridItems)
+          ) {
+            return (
+              <GridInput
+                key={property.name}
+                property={property}
+                inputs={inputs}
+                propertyPath={fullPath}
+                onInputChange={onInputChange}
+                readOnly={readOnly}
+                breadcrumbTrail={[...breadcrumbTrail, property.label]}
+                nodeName={nodeName}
+                isLoading={isLoading}
+                onCredentialChange={onCredentialChange}
+                selectedVersion={selectedVersion}
+              />
+            );
+          } else if (
+            (property.type === "asyncOptions" ||
+              property.type === "asyncMultiOptions" ||
+              property.type === "asyncPropertyCollection") &&
+            property.loadMethod
+          ) {
+            return (
+              <AsyncPropertyHandler
+                key={property.name}
+                property={property}
+                inputs={inputs}
+                propertyPath={fullPath}
+                onInputChange={onInputChange}
+                selectedVersion={selectedVersion}
+                nodeName={nodeName}
+                onCredentialChange={onCredentialChange}
+                readOnly={readOnly}
+                breadcrumbTrail={breadcrumbTrail}
+              />
+            );
+          } else if (
+            property.type === "asyncCredential" &&
+            property.loadMethod
+          ) {
+            return (
+              <AsyncCredentialHandler
+                key={property.name}
+                property={property}
+                inputs={inputs}
+                selectedVersion={selectedVersion}
+                nodeName={nodeName}
+                onCredentialChange={onCredentialChange}
                 readOnly={readOnly}
               />
             );

@@ -5,5 +5,5 @@ export const commonPrimitiveTypesSchema = z.union([
   z.string(),
   z.boolean(),
   z.null(),
-  z.undefined(),
+  // z.undefined(),
 ]);

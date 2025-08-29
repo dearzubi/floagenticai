@@ -1,6 +1,5 @@
 import { getHatchetClient } from "../../../../lib/hatchet/index.js";
 import {
-  CredentialData,
   WorkflowAgentToolApprovalResultsEvent,
   WorkflowOrchestratorTaskInputs,
   WorkflowOrchestratorTaskOutputs,
@@ -9,35 +8,37 @@ import { TASK_CONFIGS } from "./configs.js";
 import { DurableContext, Duration } from "@hatchet-dev/typescript-sdk";
 import {
   generateNodesDependencyMap,
-  getExecutableNodeIds,
-  filterExecutableNodesForRouterAgent,
   getWorkflowCredentials,
   handleWorkflowExecutionError,
   parseWorkflow,
   publishWorkflowNodeExecutionEvent,
   resolveInputReferences,
+  filterExecutableNodes,
 } from "../utils.js";
-import { NodeExecutionOutput } from "../../builder/nodes/types.js";
+import {
+  NodeExecutionOutput,
+  NodeSuccessExecutionOutput,
+} from "../../node/types.js";
 import {
   AgentArtifacts,
   AgentToolApprovalItem,
-  extractNodeNameFromNodeId,
   TriggerNodeNames,
   WorkflowBuilderUINodeData,
 } from "common";
 import { JsonObject } from "@hatchet-dev/typescript-sdk/v1/types.js";
-import { workflowNodes } from "../../builder/nodes/index.js";
-import { handleNodeExecutionError } from "../../builder/nodes/utils.js";
+import { workflowNodes } from "../../node/index.js";
+import { handleNodeExecutionError } from "../../node/utils.js";
 import { decryptData } from "../../../../utils/encryption.js";
-import { safeParseJSON } from "../../../../utils/misc.js";
-import { OutputsShape as AgentOutputsShape } from "../../builder/nodes/agents/agent/v1/schemas.js";
+import { safeParseJSON } from "common";
 import { logger } from "../../../../utils/logger/index.js";
-import { OutputsShape as RouterAgentOutputsShape } from "../../builder/nodes/agents/router-agent/v1/schemas.js";
 import { createChatMessage } from "../../../chat/crud/index.js";
 import {
   ChatSenderRole,
   ChatStatus,
 } from "../../../../database/entities/chat.entity.js";
+import { CredentialData } from "../../../credentials/crud/types.js";
+import { DB, getDB } from "../../../../database/init.js";
+import { AgentOutputs } from "../../../ai/agent/types.js";
 /**
  * Execute a set of nodes in the workflow that are ready to be executed
  *
@@ -54,6 +55,7 @@ import {
  * @param credentials - The credentials attached to the workflow nodes
  * @param ctx - Hatchet workflow execution context
  * @param userId - User Id
+ * @param db - Database instance
  * @param chatMessageIds - (Optional) Chat message Ids associated with a node during previous run. Used to update a message after tool call approvals.
  */
 const executeNodes = async ({
@@ -70,6 +72,7 @@ const executeNodes = async ({
   credentials,
   ctx,
   userId,
+  db,
   chatMessageIds = new Map<string, string>(),
 }: {
   sessionId: string;
@@ -87,6 +90,7 @@ const executeNodes = async ({
   };
   credentials: CredentialData[];
   ctx: DurableContext<WorkflowOrchestratorTaskInputs, {}>;
+  db: DB;
   userId?: string;
   chatMessageIds?: Map<string, string>;
 }): Promise<void> => {
@@ -166,6 +170,8 @@ const executeNodes = async ({
       sessionId,
       toolApprovalResults: nodeToolApprovalsResults?.get(nodeId),
       chatMessageId: chatMessageIds?.get(nodeId),
+      db,
+      userId,
     });
 
     nodeExecutionPromises.push(nodeExecutionPromise);
@@ -195,20 +201,16 @@ const executeNodes = async ({
           triggerName: trigger.name,
           nodeId: nodeExecutionOutput.nodeId,
         });
-        const nodeName = extractNodeNameFromNodeId(nodeExecutionOutput.nodeId);
-        let content: string | undefined;
+
+        let content: string | undefined = "";
         let artifacts: AgentArtifacts = {};
 
-        if (nodeName === "agent" || nodeName === "one_inch_agent") {
-          content = (nodeExecutionOutput.outputs as AgentOutputsShape)
-            .finalOutput;
-          artifacts =
-            (nodeExecutionOutput.outputs as AgentOutputsShape).artifacts ?? {};
-        } else if (nodeName === "router_agent") {
-          content = `**Selected route**: ${
-            (nodeExecutionOutput.outputs as RouterAgentOutputsShape)
-              .selectedCondition.name
-          }`;
+        const agentNodeOutput =
+          nodeExecutionOutput as NodeSuccessExecutionOutput<AgentOutputs>;
+
+        if (agentNodeOutput.outputs.type === "agent") {
+          content = agentNodeOutput.outputs.finalOutput || "";
+          artifacts = agentNodeOutput.outputs.artifacts || {};
         }
 
         const chat = await createChatMessage(
@@ -216,7 +218,7 @@ const executeNodes = async ({
             id: nodeExecutionOutput.chatMessageId,
             workflowId,
             role: ChatSenderRole.ASSISTANT,
-            content: content ?? "",
+            content: content,
             status: ChatStatus.COMPLETED,
             nodeData: JSON.stringify({
               nodeId: nodeExecutionOutput.nodeId,
@@ -315,7 +317,7 @@ const executeNodes = async ({
         result.status === "fulfilled" &&
         result.value.success &&
         (
-          (result.value.outputs as AgentOutputsShape)?.artifacts
+          (result.value.outputs as AgentOutputs)?.artifacts
             ?.agentToolApprovals ?? []
         ).length > 0,
     )
@@ -328,7 +330,7 @@ const executeNodes = async ({
 
     const events = await ctx.waitFor({
       eventKey: "workflow:agent:tool:approval",
-      expression: `input.workflowId == '${workflowId}'`,
+      expression: `input.workflowId == '${workflowId}'`, //TODO: Handle sessionId (or executionId) in the future
     });
 
     const toolApprovalEvent = (events?.["workflow:agent:tool:approval"] ||
@@ -368,6 +370,7 @@ const executeNodes = async ({
         nodeToolApprovalsResults,
         chatMessageIds,
         userId,
+        db,
       });
     }
   }
@@ -388,9 +391,15 @@ export const workflowOrchestratorTask = hatchet.durableTask<
       input;
     const executionId = ctx.workflowRunId();
     try {
+      const decryptedTriggerData = decryptData(encryptedTriggerData);
+
+      const triggerData = safeParseJSON<Record<string, unknown>>(
+        decryptedTriggerData.ok ? decryptedTriggerData.plainText : "{}",
+      );
+
       const decryptedFlowData = decryptData(input.encryptedFlowData);
 
-      const { nodes, edges } = await parseWorkflow(
+      const { nodes, edges } = parseWorkflow(
         workflowId,
         decryptedFlowData.ok ? decryptedFlowData.plainText : undefined,
       );
@@ -409,33 +418,23 @@ export const workflowOrchestratorTask = hatchet.durableTask<
       const maxIterations = remainingNodeIds.size * 2;
       let currentIteration = 0;
 
-      const decryptedTriggerData = decryptData(encryptedTriggerData);
-
-      const triggerData = safeParseJSON<Record<string, unknown>>(
-        decryptedTriggerData.ok ? decryptedTriggerData.plainText : "{}",
-      );
-
       while (remainingNodeIds.size > 0 && currentIteration < maxIterations) {
         currentIteration++;
 
-        let executableNodeIds = getExecutableNodeIds({
-          remainingNodeIds,
-          executedNodeIds: new Set(Array.from(executedNodesMap.keys())),
-          dependencyMap,
-        });
-
-        // Filter out nodes that shouldn't execute based on router agent conditions
-        executableNodeIds = filterExecutableNodesForRouterAgent({
-          executableNodeIds,
+        const executableNodeIds = filterExecutableNodes({
           remainingNodeIds,
           executedNodesMap,
+          dependencyMap,
           edges,
         });
 
         if (executableNodeIds.length === 0) {
-          throw new Error(
-            `Workflow deadlock detected. Unexecutable nodes: ${Array.from(remainingNodeIds)}`,
-          );
+          return {
+            workflowId,
+            executionId,
+            success: true,
+            outputs: Array.from(executedNodesMap.values()),
+          } satisfies WorkflowOrchestratorTaskOutputs;
         }
 
         await executeNodes({
@@ -454,6 +453,7 @@ export const workflowOrchestratorTask = hatchet.durableTask<
           credentials,
           ctx,
           userId,
+          db: await getDB(),
         });
       }
 

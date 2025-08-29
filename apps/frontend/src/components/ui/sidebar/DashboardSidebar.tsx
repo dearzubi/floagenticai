@@ -45,6 +45,13 @@ let navItems: NavItem[] = [
     to: "/credentials",
     activeHighlightRoutes: ["/credentials"],
   },
+  {
+    id: "mcp-servers",
+    label: "MCP Servers",
+    icon: "lucide:server",
+    to: "/mcp-servers",
+    activeHighlightRoutes: ["/mcp-servers"],
+  },
   // { id: "agents", label: "Agent Hub", icon: "lucide:bot", to: "" },
   // { id: "analytics", label: "Analytics", icon: "lucide:bar-chart-2", to: "" },
   // { id: "settings", label: "Settings", icon: "lucide:settings", to: "" },

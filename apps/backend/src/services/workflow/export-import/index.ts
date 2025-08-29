@@ -1,7 +1,7 @@
 import { Workflow } from "../../../database/entities/workflow.entity.js";
 import { createWorkflow, getWorkflow } from "../crud/index.js";
 import { User } from "../../../database/entities/user.entity.js";
-import { safeParseJSON } from "../../../utils/misc.js";
+import { safeParseJSON } from "common";
 import {
   ImportWorkflowAPIRequestData,
   workflowSerialisedReactFlowSchema,

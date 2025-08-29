@@ -14,3 +14,29 @@ export const useListAllNodes = (enabled = true) => {
     staleTime: envs.VITE_DISABLE_API_CACHING ? 0 : 60 * 1000,
   });
 };
+
+/**
+ * Calls a load method on a node on the server and fetches data from the API.
+ * @param nodeName
+ * @param methodName
+ * @param inputs
+ * @param enabled
+ */
+export const useLoadMethod = ({
+  nodeName,
+  methodName,
+  inputs,
+  enabled = true,
+}: {
+  nodeName: string;
+  methodName: string;
+  inputs: Record<string, unknown>;
+  enabled?: boolean;
+}) => {
+  return useQuery({
+    queryKey: ["workflow", "node", "load-method", nodeName, methodName, inputs],
+    queryFn: () => workflowNodeApi.loadMethod({ nodeName, methodName, inputs }),
+    enabled: enabled,
+    staleTime: envs.VITE_DISABLE_API_CACHING ? 0 : 60 * 1000,
+  });
+};

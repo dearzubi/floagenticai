@@ -7,7 +7,7 @@ export class OpenAICredentials implements INodeCredential {
   properties: INodeCredential["properties"];
 
   constructor() {
-    this.name = "open_ai_credentials";
+    this.name = "openai";
     this.label = "OpenAI Credentials";
     this.icon = "openai-logo.svg";
     this.properties = [
