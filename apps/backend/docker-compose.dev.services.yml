@@ -1,0 +1,155 @@
+services:
+  floagenticai-postgres:
+    image: postgres:17.6
+    restart: unless-stopped
+    hostname: floagenticai-postgres
+    environment:
+      POSTGRES_USER: ${DATABASE_USER:-floagenticai}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME:-floagenticai}
+    ports:
+      - "${DATABASE_PORT:-5432}:5432"
+    volumes:
+      - floagenticai_postgres_data:/srv/floagenticai/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -d ${DATABASE_NAME:-floagenticai} -U ${DATABASE_USER:-floagenticai}",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    networks:
+      - floagenticai-network
+
+  hatchet-postgres:
+    image: postgres:17.6
+    command: postgres -c 'max_connections=1000'
+    restart: unless-stopped
+    hostname: hatchet-postgres
+    environment:
+      POSTGRES_USER: ${HATCHET_POSTGRES_USER:-hatchet}
+      POSTGRES_PASSWORD: ${HATCHET_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${HATCHET_POSTGRES_DB:-hatchet}
+    ports:
+      - "${HATCHET_POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - hatchet_postgres_data:/srv/hatchet/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -d ${HATCHET_POSTGRES_DB:-hatchet} -U ${HATCHET_POSTGRES_USER:-hatchet}",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    networks:
+      - hatchet-network
+
+  floagenticai-redis:
+    image: redis:8.2.1
+    restart: unless-stopped
+    hostname: floagenticai-redis
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - floagenticai_redis_data:/srv/floagenticai/redis/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - floagenticai-network
+    command: redis-server --appendonly yes
+
+  hatchet-migration:
+    image: ghcr.io/hatchet-dev/hatchet/hatchet-migrate:latest
+    command: /hatchet/hatchet-migrate
+    environment:
+      DATABASE_URL: postgresql://${HATCHET_POSTGRES_USER:-hatchet}:${HATCHET_POSTGRES_PASSWORD}@hatchet-postgres:5432/${HATCHET_POSTGRES_DB:-hatchet}?sslmode=disable
+    depends_on:
+      hatchet-postgres:
+        condition: service_healthy
+    networks:
+      - hatchet-network
+
+  hatchet-setup-config:
+    image: ghcr.io/hatchet-dev/hatchet/hatchet-admin:latest
+    command: /hatchet/hatchet-admin quickstart --skip certs --generated-config-dir /hatchet/config --overwrite=false
+    environment:
+      SERVER_MSGQUEUE_KIND: postgres
+      DATABASE_URL: postgresql://${HATCHET_POSTGRES_USER:-hatchet}:${HATCHET_POSTGRES_PASSWORD}@hatchet-postgres:5432/${HATCHET_POSTGRES_DB:-hatchet}?sslmode=disable
+      SERVER_AUTH_COOKIE_DOMAIN: localhost:8090
+      SERVER_AUTH_COOKIE_INSECURE: "t"
+      SERVER_GRPC_BIND_ADDRESS: 0.0.0.0
+      SERVER_GRPC_INSECURE: "t"
+      SERVER_GRPC_BROADCAST_ADDRESS: localhost:7077
+      SERVER_DEFAULT_ENGINE_VERSION: V1
+      SERVER_INTERNAL_CLIENT_INTERNAL_GRPC_BROADCAST_ADDRESS: hatchet-engine:7077
+    volumes:
+      - hatchet_certs:/hatchet/certs
+      - hatchet_config:/hatchet/config
+    depends_on:
+      hatchet-migration:
+        condition: service_completed_successfully
+      hatchet-postgres:
+        condition: service_healthy
+    networks:
+      - hatchet-network
+
+  hatchet-engine:
+    image: ghcr.io/hatchet-dev/hatchet/hatchet-engine:latest
+    command: /hatchet/hatchet-engine --config /hatchet/config
+    restart: on-failure
+    depends_on:
+      hatchet-setup-config:
+        condition: service_completed_successfully
+      hatchet-migration:
+        condition: service_completed_successfully
+    ports:
+      - "7077:7070"
+    environment:
+      DATABASE_URL: postgresql://${HATCHET_POSTGRES_USER:-hatchet}:${HATCHET_POSTGRES_PASSWORD}@hatchet-postgres:5432/${HATCHET_POSTGRES_DB:-hatchet}?sslmode=disable
+      SERVER_GRPC_BIND_ADDRESS: 0.0.0.0
+      SERVER_GRPC_INSECURE: "t"
+    volumes:
+      - hatchet_certs:/hatchet/certs
+      - hatchet_config:/hatchet/config
+    networks:
+      - hatchet-network
+
+  hatchet-dashboard:
+    image: ghcr.io/hatchet-dev/hatchet/hatchet-dashboard:latest
+    command: sh ./entrypoint.sh --config /hatchet/config
+    ports:
+      - "8090:80"
+    restart: on-failure
+    depends_on:
+      hatchet-setup-config:
+        condition: service_completed_successfully
+      hatchet-migration:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL: postgresql://${HATCHET_POSTGRES_USER:-hatchet}:${HATCHET_POSTGRES_PASSWORD}@hatchet-postgres:5432/${HATCHET_POSTGRES_DB:-hatchet}?sslmode=disable
+    volumes:
+      - hatchet_certs:/hatchet/certs
+      - hatchet_config:/hatchet/config
+    networks:
+      - hatchet-network
+
+volumes:
+  floagenticai_postgres_data:
+  floagenticai_redis_data:
+
+  hatchet_postgres_data:
+  hatchet_config:
+  hatchet_certs:
+
+networks:
+  floagenticai-network:
+  hatchet-network:

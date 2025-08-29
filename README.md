@@ -1,132 +1,173 @@
-# FloAgenticAI 🤖
+# FloAgenticAI 🤖✨
 
-FloAgenticAI is a modern platform designed for building and automating intelligent AI workflows. It enables you to create, customize, and deploy sophisticated workflows powered by AI agents. Whether you're automating business processes, creating intelligent assistants, or building complex AI-driven workflows, FloAgenticAI transforms your ideas into powerful, production-ready solutions without the technical complexity.
+**A simple yet powerful no-code drag-and-drop multi-agent AI workflow builder platform.**
 
-## ✨ Features
+![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)
+![React](https://img.shields.io/badge/React-20232A?logo=react&logoColor=61DAFB)
+![Node.js](https://img.shields.io/badge/Node.js-43853D?logo=node.js&logoColor=white)
 
-- **Visual Builder** - Intuitive drag-and-drop interface to design your AI workflows
-- **AI Integration** - Seamlessly connect with powerful AI models and tools
-- **Easy Deployment** - Deploy your sophisticated AI workflows with just a few clicks
+## ✨ Key Features
 
-## 🚀 Getting Started
+### 🎨 Visual Workflow Builder
 
-### Prerequisites
+- **Intuitive Drag-and-Drop Interface**: Design complex workflows using ReactFlow-powered visual editor
+- **Node-Based Architecture**: Connect different AI agents, triggers, and actions with simple visual connections
+- **Real-time Preview**: See your workflow in action as you build it
 
-- Node.js (Latest LTS version recommended)
-- PNPM package manager
+### 🤖 Multi-Agent AI Integration
 
-### Installation
+- **Multiple AI Providers**: Seamlessly integrate with OpenAI, Google Gemini, and other leading AI services
+- **Agent Specialisation**: Create specialised agents for different tasks (content creation, analysis, decision-making)
+- **Intelligent Routing**: Automatically route tasks to the most appropriate agent based on context
+- **MCP (Modal Context Protocol)**: Enhance agents' capabilities by integrating with various MCP servers.
 
-1. Clone the repository:
+### ⚡ Powerful Execution Engine
 
-```bash
-git clone https://github.com/dearzubi/floagenticai && cd floagenticai
+- **Distributed Processing**: Powered by Hatchet.run for scalable, distributed workflow execution
+- **Real-time Monitoring**: Track workflow execution with live updates via Socket.IO
+- **Error Handling**: Robust error handling and retry mechanisms
+
+### 💬 Interactive Chat Interface
+
+- **Conversational Workflows**: Build chat-based interfaces for your AI workflows
+- **Message History**: Complete chat history and context management
+- **Multi-turn Conversations**: Support for complex, context-aware conversations
+
+## 🏗️ Architecture
+
+FloAgenticAI is built as a modern TypeScript monorepo with a clear separation of concerns:
+
+```
+FloAgenticAI/
+├── apps/
+│   ├── frontend/          # React 19 SPA with visual workflow builder
+│   └── backend/           # Express.js API with workflow execution engine
+└── packages/
+    └── common/            # Shared types and utilities
 ```
 
-2. Install dependencies:
+### Backend Architecture
 
-```bash
-pnpm install
-```
+- **RESTful APIs**: Express based API endpoints with Zod validation
+- **Service Layer**: Domain-separated business logic (workflows, chat, credentials, users)
+- **Database Layer**: MikroORM with PostgreSQL for data persistence, and Redis for Pub/Sub and caching
+- **Real-time Communication**: Socket.IO for live workflow updates and chat
+- **Workflow Engine**: Hatchet.run integration for distributed execution
 
-### ⚙️ Environment Configuration
+### Frontend Architecture
 
-#### Frontend Environment Variables (.env)
-
-Create a `.env` file in the `apps/frontend` directory with the following variables:
-
-Firebase Configuration:
-
-- `VITE_FIREBASE_API_KEY`=your_api_key
-- `VITE_FIREBASE_AUTH_DOMAIN`=your_domain.firebaseapp.com
-- `VITE_FIREBASE_PROJECT_ID`=your_project_id
-- `VITE_FIREBASE_STORAGE_BUCKET`=your_storage_bucket
-- `VITE_FIREBASE_MESSAGING_SENDER_ID`=your_sender_id
-- `VITE_FIREBASE_APP_ID`=your_app_id
-- `VITE_FIREBASE_MEASUREMENT_ID`=your_measurement_id
-
-These variables are used for [Firebase web sdk](https://www.npmjs.com/package/firebase):
-
-- Firebase Authentication
-- Firebase Cloud Storage
-- Firebase Analytics
-
-#### Backend Environment Variables (.env)
-
-Create a `.env` file in the `apps/backend` directory with the following variables:
-
-PostgreSQL Database Configuration:
-
-- `DATABASE_HOST`=your_pg_database_host
-- `DATABASE_PORT`=your_pg_database_port
-- `DATABASE_USER`=your_pg_database_username
-- `DATABASE_PASSWORD`=your_pg_database_password
-- `DATABASE_NAME`=your_pg_database_name
-
-Server Configuration:
-
-- `NODE_ENV`=development | production
-- `PORT`=server_port
-
-Firebase Admin Configurations:
-
-You need to get the following variables from your Firebase service account JSON file.
-They are used to set up and access [Firebase admin sdk](https://www.npmjs.com/package/firebase-admin).
-
-- `FIREBASE_PROJECT_ID`=your_project_id
-- `FIREBASE_PRIVATE_KEY`=your_private_key
-- `FIREBASE_CLIENT_EMAIL`=your_client_email
-
-### Start the development server:
-
-```bash
-pnpm dev
-```
+- **File-based Routing**: TanStack Router for type-safe navigation
+- **State Management**: Zustand for UI state, TanStack Query for server state
+- **Component Architecture**: Modular, reusable components with HeroUI design system
+- **Visual Editor**: XYFlow/ReactFlow for the workflow builder interface
 
 ## 🛠️ Tech Stack
 
-- **Frontend:** [React 19](https://react.dev/)
-- **Backend:** [Express.js v5](https://expressjs.com/)
-- **Language:** [TypeScript](https://www.typescriptlang.org/)
-- **Database Management:**
-  - Database: [PostgreSQL](https://www.postgresql.org/)
-  - ORM: [MikroORM](https://mikro-orm.io/)
-- **Routing:** [TanStack Router](https://tanstack.com/router/latest)
-- **State Management:**
-  - Synchronous: [Zustand](https://zustand.docs.pmnd.rs/)
-  - Asynchronous: [TanStack Query](https://tanstack.com/query/latest)
-- **UI Components:** [HeroUI](https://www.heroui.com/)
-- **Styling:** [TailwindCSS V3](https://v3.tailwindcss.com/)
-- **Animations:** [Framer Motion](https://motion.dev/)
-- **Authentication:** [Firebase Authentication](https://firebase.google.com/docs/auth)
-- **Testing Frontend:** [Vitest](https://vitest.dev/) with [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/)
-- **Code Quality:**
-  - [ESLint/TS-ESLint](https://typescript-eslint.io/)
-  - [Prettier](https://prettier.io/)
-  - [Husky for Git hooks](https://typicode.github.io/husky/)
-- **CI/CD:**
-  - [GitHub Actions](https://github.com/features/actions)
-  - [Release It](https://github.com/release-it/release-it)
+### Core Technologies
 
-## 📝 Available Scripts
+- **Language**: [TypeScript](https://www.typescriptlang.org/) (ESM)
+- **Frontend**: [React 19](https://react.dev/) with [Vite](https://vitejs.dev/)
+- **Backend**: [Express.js v5](https://expressjs.com/) with Node.js
+- **Database**: [PostgreSQL](https://www.postgresql.org/) with [MikroORM v6](https://mikro-orm.io/)
 
-- `pnpm dev` - Start development server
-- `pnpm build` - Build for production
-- `pnpm preview` - Preview production build
-- `pnpm test` - Run tests
-- `pnpm lint` - Run linting
-- `pnpm lint:fix` - Fix linting issues
-- `pnpm check-types` - Check TypeScript types
-- `pnpm coverage` - Run tests with coverage report
+### Frontend Stack
+
+- **Routing**: [TanStack Router v1](https://tanstack.com/router/latest)
+- **State Management**: [Zustand v5](https://zustand.docs.pmnd.rs/) + [TanStack Query v5](https://tanstack.com/query/latest)
+- **UI Framework**: [HeroUI v2.7](https://www.heroui.com/)
+- **Styling**: [TailwindCSS v3.4](https://tailwindcss.com/)
+- **Workflow Builder**: [ReactFlow v12](https://reactflow.dev/) (@xyflow/react)
+- **Animations**: [Framer Motion](https://motion.dev/)
+
+### Backend Stack
+
+- **API Framework**: Express.js with Socket.IO
+- **Workflow Engine**: [Hatchet.run](https://hatchet.run/)
+- **Authentication**: [Firebase Admin SDK](https://firebase.google.com/docs/admin/setup)
+- **Caching**: [Redis](https://redis.io/)
+- **AI Integration**: [Vercel AI SDK](https://sdk.vercel.ai/), OpenAI SDK, Google Gemini
+
+### Development & DevOps
+
+- **Monorepo**: [Turborepo](https://turborepo.com/)
+- **Package Manager**: [pnpm](https://pnpm.io/)
+- **Code Quality**: [ESLint](https://eslint.org/), [Prettier](https://prettier.io/), [Husky](https://typicode.github.io/husky/)
+- **Testing**: [Vitest](https://vitest.dev/) with [React Testing Library](https://testing-library.com/)
+- **CI/CD**: [GitHub Actions](https://github.com/features/actions)
+
+## 🚀 Getting Started
+
+Ready to start building? Check out our comprehensive development guide:
+
+**📖 [Development Setup Guide](DEV_SETUP.md)**
+
+The setup guide covers:
+
+- Prerequisites and installation
+- Environment configuration
+- Docker setup for services
+- Database initialization
+- Starting development servers
+
+## 🔧 Available Scripts
+
+### Root Level Commands
+
+```bash
+pnpm dev              # Start both frontend and backend
+pnpm build            # Build all packages
+pnpm lint             # Run linting across all packages
+pnpm lint:fix         # Fix linting issues
+pnpm check-types      # TypeScript type checking
+pnpm format           # Format code with Prettier
+```
+
+### Backend Commands (from `apps/backend/`)
+
+```bash
+pnpm dev              # Start backend with hot reload
+pnpm db:schema:update # Update database schema
+```
+
+### Frontend Commands (from `apps/frontend/`)
+
+```bash
+pnpm dev              # Start Vite dev server
+pnpm build            # Build for production
+pnpm preview          # Preview production build
+```
+
+## 🤝 Contributing
+
+We welcome contributions! Here's how to get started:
+
+1. **Fork the repository**
+2. **Create a feature branch**: `git checkout -b feature/amazing-feature`
+3. **Follow our coding guidelines**: Use conventional commits, maintain type safety
+4. **Test your changes**: Run `pnpm lint` and `pnpm check-types`
+5. **Submit a pull request**: Target the `development` branch
+
+### Development Workflow
+
+- Feature branches should be created from `development`
+- Use conventional commit messages (`feat:`, `fix:`, `chore:`, etc.)
+- Ensure all type checks and lints pass before submitting PRs
 
 ## 📄 License
 
-This project is licensed under the terms of [the Apache 2.0](LICENSE) license.
+This project is licensed under the **Apache License 2.0** - see the [LICENSE](LICENSE) file for details.
 
-## 📞 Support
+## 🌐 Links & Support
+- **Contact**: zubairkhalidce@gmail.com
+- **Issues**: [GitHub Issues](https://github.com/dearzubi/floagenticai/issues)
 
-If you have any questions, need help, or have an awesome suggestion, please open an issue in the repository or visit [https://sagestudios.ai/contact](https://sagestudios.ai/contact)
+## 🙏 Acknowledgments
+
+Built with ❤️, powered by an incredible ecosystem of open-source tools and the vibrant AI community.
 
 ---
 
-Built with ❤️, ☕, and an army of AI agents working overtime 🤖
+**Ready to build the future of AI automation?** 🚀
+
+Start by exploring our [Development Setup Guide](DEV_SETUP.md) and join the community of builders creating the next generation of intelligent workflows.

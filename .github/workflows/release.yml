@@ -1,4 +1,4 @@
-name: Release version
+name: Manual Release
 on: workflow_dispatch
 
 concurrency:
@@ -21,23 +21,42 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22.11.0
-
       - name: Configure Git User
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Install Dependencies
-        run: |
-          npm install -g pnpm@9.12.3
-          pnpm install
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.7.0
 
-      - name: Release
+      - name: Setup pnpm and Install Dependencies
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: true
+
+      - name: Create Release
         run: pnpm release
         env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_IT_GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_IT_GITHUB_TOKEN: ${{ secrets.RELEASE_IT_GITHUB_TOKEN }}
+
+      - name: Create release summary
+        run: |
+          LATEST_TAG=$(git describe --tags --abbrev=0)
+          echo "## 🚀 Release Created" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Parameter | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Version** | $LATEST_TAG |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Branch** | ${{ github.ref_name }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Commit** | ${{ github.sha }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Created At** | $(date -u) |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📦 Deployment" >> $GITHUB_STEP_SUMMARY
+          echo "Use the **Deploy to VPS** workflow to deploy this release:" >> $GITHUB_STEP_SUMMARY
+          echo "1. Go to Actions → Deploy to VPS" >> $GITHUB_STEP_SUMMARY
+          echo "2. Select git reference: \`$LATEST_TAG\`" >> $GITHUB_STEP_SUMMARY
+          echo "3. Deploy" >> $GITHUB_STEP_SUMMARY
+

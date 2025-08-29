@@ -13,6 +13,7 @@ export default defineConfig({
   migrations: {
     path: "./dist/database/migrations",
     pathTs: "./src/database/migrations",
+    snapshot: false,
   },
   dbName: process.env.DATABASE_NAME,
   host: process.env.DATABASE_HOST,

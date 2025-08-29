@@ -1,24 +1,43 @@
-DATABASE_HOST=
-DATABASE_PORT=
-DATABASE_USER=
-DATABASE_PASSWORD=
-DATABASE_NAME=
-NODE_ENV='development | production'
-PORT=
+# ------------------------------
+# REQUIRED BACKEND ENV VARIABLES
+# ------------------------------
+
+DATABASE_PORT=PostgreSQL port, e.g. 5432
+DATABASE_USER=PostgreSQL user
+DATABASE_PASSWORD=PostgreSQL password
+DATABASE_NAME=PostgreSQL database name
+
 FIREBASE_PROJECT_ID=
 FIREBASE_PRIVATE_KEY=
 FIREBASE_CLIENT_EMAIL=
-DATABASE_ENABLE_LOGGING='true | false'
-ENABLE_POSTHOG='true | false'
-POSTHOG_API_KEY=
-ENCRYPTION_KEY='Must be 32 bytes and base64 formatted'
+
+ENCRYPTION_KEY=Must be 32 bytes and base64 formatted, to encrypt sensitive data in the database like credentials and workflow
+
 HATCHET_CLIENT_TOKEN=
-HATCHET_CLIENT_TLS_STRATEGY=
-NUMBER_OF_HATCHET_WORKERS=1
+
 REDIS_HOST=
 REDIS_PORT=
-REDIS_USER=
-REDIS_PASSWORD=
-DISABLE_LOGGING='true | false'
-DEBUG_MODE='true | false'
-DISABLE_FILE_LOGGING='true | false'
+
+# ------------------------------
+# OPTIONAL BACKEND ENV VARIABLES
+# ------------------------------
+
+DATABASE_HOST=PostgreSQL host, e.g. localhost - Only required if not using default localhost or database is hosted somewhere else
+DATABASE_ENABLE_LOGGING=true | false
+ENABLE_POSTHOG=true | false
+POSTHOG_API_KEY=
+HATCHET_CLIENT_TLS_STRATEGY=defaults to 'none'
+NUMBER_OF_HATCHET_WORKERS=1
+DISABLE_LOGGING=true | false - disable all logging (no stdout or file logging)
+DEBUG_MODE=true | false - display debug logs
+DISABLE_FILE_LOGGING=true | false - disable file logging
+NODE_ENV=development | production - Defaults to development
+PORT=Express server port, e.g. 4000 - Defaults to 4000
+
+# ------------------------------
+# REQUIRED HATCHET ENV VARIABLES
+# ------------------------------
+HATCHET_POSTGRES_USER=
+HATCHET_POSTGRES_PASSWORD=
+HATCHET_POSTGRES_DB=
+HATCHET_POSTGRES_PORT=
