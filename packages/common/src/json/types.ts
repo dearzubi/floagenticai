@@ -45,9 +45,7 @@ export interface JSONSchemaDraft07 {
   properties?: Record<string, JSONSchemaDraft07>;
   patternProperties?: Record<string, JSONSchemaDraft07>;
   additionalProperties?: boolean | JSONSchemaDraft07;
-  dependencies?: {
-    [key: string]: JSONSchemaDraft07 | string[];
-  };
+  dependencies?: Record<string, JSONSchemaDraft07 | string[]>;
   propertyNames?: JSONSchemaDraft07;
 
   if?: JSONSchemaDraft07;
@@ -59,9 +57,7 @@ export interface JSONSchemaDraft07 {
   oneOf?: JSONSchemaDraft07[];
   not?: JSONSchemaDraft07;
 
-  definitions?: {
-    [key: string]: JSONSchemaDraft07;
-  };
+  definitions?: Record<string, JSONSchemaDraft07>;
 
   format?: string;
 

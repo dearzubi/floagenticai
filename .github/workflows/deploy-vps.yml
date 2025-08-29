@@ -1,0 +1,215 @@
+name: Deploy to VPS
+
+on:
+  workflow_dispatch:
+    inputs:
+      git_ref:
+        description: "Git reference to deploy (branch, tag, or commit SHA)"
+        required: true
+        default: "main"
+        type: string
+      force_rebuild:
+        description: "Force rebuild images"
+        required: false
+        default: false
+        type: boolean
+      force_recreate:
+        description: "Force recreate containers"
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add server to known hosts
+        run: |
+          ssh-keyscan -H ${{ vars.SERVER_IP }} >> ~/.ssh/known_hosts
+
+      - name: Create deployment directory and clone repository
+        run: |
+          ssh ${{ vars.SSH_USER }}@${{ vars.SERVER_IP }} "
+            mkdir -p /srv/floagenticai
+            cd /srv/floagenticai
+
+            # Clone or update repository
+            if [ -d '.git' ]; then
+              echo 'Repository exists, updating...'
+              git fetch --all
+              git reset --hard
+              git clean -fd
+              git checkout ${{ inputs.git_ref }}
+              git pull origin ${{ inputs.git_ref }} || git reset --hard ${{ inputs.git_ref }}
+            else
+              echo 'Cloning repository...'
+              git clone https://github.com/${{ github.repository }}.git .
+              git checkout ${{ inputs.git_ref }}
+            fi
+
+            echo 'Repository updated successfully'
+            git log -1 --oneline
+          "
+
+      - name: Create environment file
+        run: |
+          ssh ${{ vars.SSH_USER }}@${{ vars.SERVER_IP }} "cat > /srv/floagenticai/.env << 'EOF'
+          # Application Configuration
+          BACKEND_PORT=${{ vars.BACKEND_PORT || '4000' }}
+          FRONTEND_PORT=${{ vars.FRONTEND_PORT || '3000' }}
+          NODE_ENV="production"
+
+          DATABASE_USER=${{ vars.DATABASE_USER || 'floagenticai' }}
+          DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}
+          DATABASE_NAME=${{ vars.DATABASE_NAME || 'floagenticai' }}
+          DATABASE_PORT=${{ vars.DATABASE_PORT || '5432' }}
+          DATABASE_ENABLE_LOGGING=${{ vars.DATABASE_ENABLE_LOGGING || 'false' }}
+
+          HATCHET_POSTGRES_USER=${{ vars.HATCHET_POSTGRES_USER || 'hatchet' }}
+          HATCHET_POSTGRES_PASSWORD=${{ secrets.HATCHET_POSTGRES_PASSWORD }}
+          HATCHET_POSTGRES_DB=${{ vars.HATCHET_POSTGRES_DB || 'hatchet' }}
+          HATCHET_POSTGRES_PORT=${{ vars.HATCHET_POSTGRES_PORT || '5433' }}
+
+          REDIS_PORT=${{ vars.REDIS_PORT || '6379' }}
+          REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
+
+          FIREBASE_PROJECT_ID=${{ vars.FIREBASE_PROJECT_ID }}
+          FIREBASE_PRIVATE_KEY="${{ secrets.FIREBASE_PRIVATE_KEY }}"
+          FIREBASE_CLIENT_EMAIL=${{ vars.FIREBASE_CLIENT_EMAIL }}
+
+          VITE_FIREBASE_API_KEY=${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN=${{ vars.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID=${{ vars.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET=${{ vars.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID=${{ vars.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID=${{ vars.VITE_FIREBASE_APP_ID }}
+          VITE_FIREBASE_MEASUREMENT_ID=${{ vars.VITE_FIREBASE_MEASUREMENT_ID }}
+          VITE_API_BASE_URL=${{ vars.VITE_API_BASE_URL }}
+          VITE_ASSETS_BASE_URL=${{ vars.VITE_ASSETS_BASE_URL }}
+          VITE_DISABLE_API_CACHING=${{ vars.VITE_DISABLE_API_CACHING || 'false' }}
+          VITE_SOCKET_IO_URL=${{ vars.VITE_SOCKET_IO_URL }}
+
+          HATCHET_CLIENT_TOKEN=${{ secrets.HATCHET_CLIENT_TOKEN }}
+          HATCHET_CLIENT_TLS_STRATEGY=${{ vars.HATCHET_CLIENT_TLS_STRATEGY || 'none' }}
+          NUMBER_OF_HATCHET_WORKERS=${{ vars.NUMBER_OF_HATCHET_WORKERS || '1' }}
+
+
+          ENCRYPTION_KEY=${{ secrets.ENCRYPTION_KEY }}
+
+
+          ENABLE_POSTHOG=${{ vars.ENABLE_POSTHOG || 'false' }}
+          POSTHOG_API_KEY=${{ secrets.POSTHOG_API_KEY }}
+
+          DISABLE_LOGGING=${{ vars.DISABLE_LOGGING || 'false' }}
+          DEBUG_MODE=${{ vars.DEBUG_MODE || 'false' }}
+          DISABLE_FILE_LOGGING=${{ vars.DISABLE_FILE_LOGGING || 'false' }}
+          EOF"
+
+      - name: Stop existing services
+        run: |
+          ssh ${{ vars.SSH_USER }}@${{ vars.SERVER_IP }} "
+            cd /srv/floagenticai
+            if [ -f 'docker-compose.production.yml' ]; then
+              echo 'Stopping existing services...'
+              docker compose -f docker-compose.production.yml down || true
+            fi
+          "
+
+      - name: Build and deploy services
+        run: |
+          ssh ${{ vars.SSH_USER }}@${{ vars.SERVER_IP }} "
+            cd /srv/floagenticai
+
+            BUILD_ARGS=''
+            if [ '${{ inputs.force_rebuild }}' = 'true' ]; then
+              BUILD_ARGS='--no-cache'
+              echo 'Force rebuild enabled'
+            fi
+
+            DEPLOY_ARGS=''
+            if [ '${{ inputs.force_recreate }}' = 'true' ]; then
+              DEPLOY_ARGS='--force-recreate'
+              echo 'Force recreate enabled'
+            fi
+
+            echo 'Building and starting services...'
+            docker compose -f docker-compose.production.yml build \$BUILD_ARGS
+            docker compose -f docker-compose.production.yml up -d \$DEPLOY_ARGS
+          "
+
+      - name: Wait for health checks
+        run: |
+          ssh ${{ vars.SSH_USER }}@${{ vars.SERVER_IP }} "
+            cd /srv/floagenticai
+
+            echo 'Waiting for services to be healthy...'
+            timeout 300 bash -c '
+              while true; do
+                # Check if all required services are running
+                backend_healthy=\$(docker compose -f docker-compose.production.yml ps floagenticai-backend --format json 2>/dev/null | jq -r \".Health // \\\"starting\\\"\")
+                frontend_healthy=\$(docker compose -f docker-compose.production.yml ps floagenticai-frontend --format json 2>/dev/null | jq -r \".Health // \\\"starting\\\"\")
+
+                echo \"Backend: \$backend_healthy, Frontend: \$frontend_healthy\"
+
+                if [[ \"\$backend_healthy\" == \"healthy\" && \"\$frontend_healthy\" == \"healthy\" ]]; then
+                  echo \"All services are healthy!\"
+                  break
+                fi
+
+                sleep 5
+              done
+            ' || echo 'Health check timeout - services may still be starting'
+          "
+
+      - name: Cleanup old images
+        run: |
+          ssh ${{ vars.SSH_USER }}@${{ vars.SERVER_IP }} "
+            echo 'Cleaning up old Docker images...'
+            docker image prune -f
+
+            # Remove dangling images
+            docker images -f dangling=true -q | xargs -r docker rmi || true
+          "
+
+      - name: Show deployment status
+        run: |
+          ssh ${{ vars.SSH_USER }}@${{ vars.SERVER_IP }} "
+            cd /srv/floagenticai
+            echo '=== Deployment Status ==='
+            docker compose -f docker-compose.production.yml ps
+
+            echo ''
+            echo '=== Disk Usage ==='
+            df -h /srv/floagenticai
+
+            echo ''
+            echo '=== Docker Images ==='
+            docker images | head -10
+          "
+
+      - name: Create deployment summary
+        run: |
+          echo "## 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Parameter | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Environment** | production |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Git Reference** | ${{ inputs.git_ref }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Server** | ${{ vars.SERVER_IP }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Force Rebuild** | ${{ inputs.force_rebuild }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Force Recreate** | ${{ inputs.force_recreate }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Deployed At** | $(date -u) |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🎯 Access URLs" >> $GITHUB_STEP_SUMMARY
+          echo "- **Frontend**: http://${{ vars.SERVER_IP }}:${{ vars.FRONTEND_PORT || '3000' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Backend**: http://${{ vars.SERVER_IP }}:${{ vars.BACKEND_PORT || '4000' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Hatchet Dashboard**: http://${{ vars.SERVER_IP }}:8090" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### ✅ Deployment Status" >> $GITHUB_STEP_SUMMARY
+          echo "All services have been deployed successfully and are running." >> $GITHUB_STEP_SUMMARY

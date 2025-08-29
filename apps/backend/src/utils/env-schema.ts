@@ -1,7 +1,7 @@
 import { z } from "zod/v4";
 
 const envSchema = z.object({
-  DATABASE_HOST: z.string().trim().nonempty().default("localhost"),
+  DATABASE_HOST: z.string().trim().default("localhost"),
   DATABASE_PORT: z.coerce.number().int().default(5432),
   DATABASE_USER: z.string().trim().nonempty(),
   DATABASE_PASSWORD: z.string().trim().nonempty(),
@@ -28,7 +28,7 @@ const envSchema = z.object({
   POSTHOG_API_KEY: z.string().trim().optional(),
   ENCRYPTION_KEY: z.string().trim().nonempty(),
   HATCHET_CLIENT_TOKEN: z.string().trim().nonempty(),
-  HATCHET_CLIENT_TLS_STRATEGY: z.string().trim().nonempty().default("none"),
+  HATCHET_CLIENT_TLS_STRATEGY: z.string().trim().default("none"),
   NUMBER_OF_HATCHET_WORKERS: z.coerce.number().int().default(1),
   REDIS_HOST: z.string().trim().nonempty().default("localhost"),
   REDIS_PORT: z.coerce.number().int().default(6379),

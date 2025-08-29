@@ -1,0 +1,259 @@
+services:
+  floagenticai-postgres:
+    image: postgres:17.6
+    restart: unless-stopped
+    hostname: floagenticai-postgres
+    environment:
+      POSTGRES_USER: ${DATABASE_USER:-floagenticai}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME:-floagenticai}
+    ports:
+      - "${DATABASE_PORT:-5432}:5432"
+    volumes:
+      - floagenticai_postgres_data:/srv/floagenticai/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -d ${DATABASE_NAME:-floagenticai} -U ${DATABASE_USER:-floagenticai}",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    networks:
+      - floagenticai-network
+
+  hatchet-postgres:
+    image: postgres:17.6
+    command: postgres -c 'max_connections=1000'
+    restart: unless-stopped
+    hostname: hatchet-postgres
+    environment:
+      POSTGRES_USER: ${HATCHET_POSTGRES_USER:-hatchet}
+      POSTGRES_PASSWORD: ${HATCHET_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${HATCHET_POSTGRES_DB:-hatchet}
+    ports:
+      - "${HATCHET_POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - hatchet_postgres_data:/srv/hatchet/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -d ${HATCHET_POSTGRES_DB:-hatchet} -U ${HATCHET_POSTGRES_USER:-hatchet}",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    networks:
+      - hatchet-network
+
+  floagenticai-redis:
+    image: redis:8.2.1
+    restart: unless-stopped
+    hostname: floagenticai-redis
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - floagenticai_redis_data:/srv/floagenticai/redis/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - floagenticai-network
+    command: redis-server --appendonly yes
+
+  floagenticai-backend:
+    build:
+      context: .
+      dockerfile: ./apps/backend/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "${BACKEND_PORT:-4000}:4000"
+    environment:
+      DATABASE_HOST: floagenticai-postgres
+      DATABASE_PORT: 5432 # Keep as 5432, do not change to DATABASE_PORT because it's internal to the docker network
+      DATABASE_USER: ${DATABASE_USER:-floagenticai}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_NAME: ${DATABASE_NAME:-floagenticai}
+      DATABASE_ENABLE_LOGGING: ${DATABASE_ENABLE_LOGGING:-false}
+
+      REDIS_HOST: floagenticai-redis
+      REDIS_PORT: 6379 # Keep as 6379, do not change to REDIS_PORT because it's internal to the docker network
+
+      PORT: 4000 # Keep as 4000, do not change to BACKEND_PORT because it's internal to the docker network
+      NODE_ENV: ${NODE_ENV:-production}
+
+      FIREBASE_PROJECT_ID: ${FIREBASE_PROJECT_ID}
+      FIREBASE_PRIVATE_KEY: ${FIREBASE_PRIVATE_KEY}
+      FIREBASE_CLIENT_EMAIL: ${FIREBASE_CLIENT_EMAIL}
+
+      HATCHET_CLIENT_TOKEN: ${HATCHET_CLIENT_TOKEN}
+      HATCHET_CLIENT_TLS_STRATEGY: ${HATCHET_CLIENT_TLS_STRATEGY:-none}
+      NUMBER_OF_HATCHET_WORKERS: ${NUMBER_OF_HATCHET_WORKERS:-1}
+
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY}
+
+      ENABLE_POSTHOG: ${ENABLE_POSTHOG:-false}
+      POSTHOG_API_KEY: ${POSTHOG_API_KEY}
+
+      DISABLE_LOGGING: ${DISABLE_LOGGING:-false}
+      DEBUG_MODE: ${DEBUG_MODE:-false}
+      DISABLE_FILE_LOGGING: ${DISABLE_FILE_LOGGING:-false}
+    volumes:
+      - floagenticai_backend_logs:/srv/floagenticai/backend/logs
+      - floagenticai_backend_uploads:/srv/floagenticai/backend/public/uploads
+    depends_on:
+      floagenticai-postgres:
+        condition: service_healthy
+      floagenticai-redis:
+        condition: service_healthy
+      hatchet-engine:
+        condition: service_started
+    networks:
+      - floagenticai-network
+      - hatchet-network
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://localhost:4000/api/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) }).on('error', () => process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  floagenticai-frontend:
+    build:
+      context: .
+      dockerfile: ./apps/frontend/Dockerfile
+      args:
+        VITE_FIREBASE_API_KEY: ${VITE_FIREBASE_API_KEY}
+        VITE_FIREBASE_AUTH_DOMAIN: ${VITE_FIREBASE_AUTH_DOMAIN}
+        VITE_FIREBASE_PROJECT_ID: ${VITE_FIREBASE_PROJECT_ID}
+        VITE_FIREBASE_STORAGE_BUCKET: ${VITE_FIREBASE_STORAGE_BUCKET}
+        VITE_FIREBASE_MESSAGING_SENDER_ID: ${VITE_FIREBASE_MESSAGING_SENDER_ID}
+        VITE_FIREBASE_APP_ID: ${VITE_FIREBASE_APP_ID}
+        VITE_FIREBASE_MEASUREMENT_ID: ${VITE_FIREBASE_MEASUREMENT_ID}
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:4000}
+        VITE_ASSETS_BASE_URL: ${VITE_ASSETS_BASE_URL:-http://localhost:4000}
+        VITE_DISABLE_API_CACHING: ${VITE_DISABLE_API_CACHING:-false}
+        VITE_SOCKET_IO_URL: ${VITE_SOCKET_IO_URL:-http://localhost:4000}
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
+    depends_on:
+      floagenticai-backend:
+        condition: service_healthy
+    networks:
+      - floagenticai-network
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost/health",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  hatchet-migration:
+    image: ghcr.io/hatchet-dev/hatchet/hatchet-migrate:latest
+    command: /hatchet/hatchet-migrate
+    environment:
+      DATABASE_URL: postgresql://${HATCHET_POSTGRES_USER:-hatchet}:${HATCHET_POSTGRES_PASSWORD}@hatchet-postgres:5432/${HATCHET_POSTGRES_DB:-hatchet}?sslmode=disable
+    depends_on:
+      hatchet-postgres:
+        condition: service_healthy
+    networks:
+      - hatchet-network
+
+  hatchet-setup-config:
+    image: ghcr.io/hatchet-dev/hatchet/hatchet-admin:latest
+    command: /hatchet/hatchet-admin quickstart --skip certs --generated-config-dir /hatchet/config --overwrite=false
+    environment:
+      SERVER_MSGQUEUE_KIND: postgres
+      DATABASE_URL: postgresql://${HATCHET_POSTGRES_USER:-hatchet}:${HATCHET_POSTGRES_PASSWORD}@hatchet-postgres:5432/${HATCHET_POSTGRES_DB:-hatchet}?sslmode=disable
+      SERVER_AUTH_COOKIE_DOMAIN: localhost:8090
+      SERVER_AUTH_COOKIE_INSECURE: "t"
+      SERVER_GRPC_BIND_ADDRESS: 0.0.0.0
+      SERVER_GRPC_INSECURE: "t"
+      SERVER_GRPC_BROADCAST_ADDRESS: localhost:7077
+      SERVER_DEFAULT_ENGINE_VERSION: V1
+      SERVER_INTERNAL_CLIENT_INTERNAL_GRPC_BROADCAST_ADDRESS: hatchet-engine:7077
+    volumes:
+      - hatchet_certs:/hatchet/certs
+      - hatchet_config:/hatchet/config
+    depends_on:
+      hatchet-migration:
+        condition: service_completed_successfully
+      hatchet-postgres:
+        condition: service_healthy
+    networks:
+      - hatchet-network
+
+  hatchet-engine:
+    image: ghcr.io/hatchet-dev/hatchet/hatchet-engine:latest
+    command: /hatchet/hatchet-engine --config /hatchet/config
+    restart: on-failure
+    depends_on:
+      hatchet-setup-config:
+        condition: service_completed_successfully
+      hatchet-migration:
+        condition: service_completed_successfully
+    ports:
+      - "7077:7070"
+    environment:
+      DATABASE_URL: postgresql://${HATCHET_POSTGRES_USER:-hatchet}:${HATCHET_POSTGRES_PASSWORD}@hatchet-postgres:5432/${HATCHET_POSTGRES_DB:-hatchet}?sslmode=disable
+      SERVER_GRPC_BIND_ADDRESS: 0.0.0.0
+      SERVER_GRPC_INSECURE: "t"
+    volumes:
+      - hatchet_certs:/hatchet/certs
+      - hatchet_config:/hatchet/config
+    networks:
+      - hatchet-network
+
+  hatchet-dashboard:
+    image: ghcr.io/hatchet-dev/hatchet/hatchet-dashboard:latest
+    command: sh ./entrypoint.sh --config /hatchet/config
+    ports:
+      - "8090:80"
+    restart: on-failure
+    depends_on:
+      hatchet-setup-config:
+        condition: service_completed_successfully
+      hatchet-migration:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL: postgresql://${HATCHET_POSTGRES_USER:-hatchet}:${HATCHET_POSTGRES_PASSWORD}@hatchet-postgres:5432/${HATCHET_POSTGRES_DB:-hatchet}?sslmode=disable
+    volumes:
+      - hatchet_certs:/hatchet/certs
+      - hatchet_config:/hatchet/config
+    networks:
+      - hatchet-network
+
+volumes:
+  floagenticai_postgres_data:
+  floagenticai_redis_data:
+  floagenticai_backend_logs:
+  floagenticai_backend_uploads:
+
+  hatchet_postgres_data:
+  hatchet_config:
+  hatchet_certs:
+
+networks:
+  floagenticai-network:
+  hatchet-network:
