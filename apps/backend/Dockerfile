@@ -1,5 +1,7 @@
 FROM node:24.7.0-alpine3.21 AS base
 
+ENV HUSKY=0
+
 RUN npm install -g pnpm
 
 WORKDIR /app
@@ -7,6 +9,7 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages/common/package.json ./packages/common/
 COPY apps/backend/package.json ./apps/backend/
+
 
 RUN pnpm install --frozen-lockfile
 
@@ -18,6 +21,8 @@ RUN pnpm --filter backend build
 
 FROM node:24.7.0-alpine3.21 AS production
 
+ENV HUSKY=0
+
 RUN npm install -g pnpm
 
 WORKDIR /app
@@ -25,6 +30,7 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages/common/package.json ./packages/common/
 COPY apps/backend/package.json ./apps/backend/
+
 
 RUN pnpm install --frozen-lockfile --prod
 

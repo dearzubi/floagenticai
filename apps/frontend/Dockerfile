@@ -1,5 +1,7 @@
 FROM node:24.7.0-alpine3.21 AS base
 
+ENV HUSKY=0
+
 RUN npm install -g pnpm
 
 WORKDIR /app
@@ -41,6 +43,8 @@ RUN pnpm --filter common build
 RUN pnpm --filter frontend build
 
 FROM nginx:alpine3.22 AS production
+
+ENV HUSKY=0
 
 COPY apps/frontend/nginx.conf /etc/nginx/conf.d/default.conf
 
