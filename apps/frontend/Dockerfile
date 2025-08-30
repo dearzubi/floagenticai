@@ -52,8 +52,7 @@ COPY apps/frontend/nginx.conf /etc/nginx/conf.d/default.conf
 
 COPY --from=base /app/apps/frontend/dist /usr/share/nginx/html
 
-RUN addgroup -g 1001 -S nginx && \
-    adduser -S frontend -u 1001 -G nginx
+RUN adduser -S frontend -u 1001 -G nginx
 
 RUN chown -R frontend:nginx /var/cache/nginx && \
     chown -R frontend:nginx /var/log/nginx && \
