@@ -10,7 +10,7 @@ services:
     ports:
       - "${DATABASE_PORT:-5432}:5432"
     volumes:
-      - floagenticai_postgres_data:/srv/floagenticai/postgresql/data
+      - floagenticai_postgres_data:/var/lib/postgresql/data
     healthcheck:
       test:
         [
@@ -36,7 +36,7 @@ services:
     ports:
       - "${HATCHET_POSTGRES_PORT:-5433}:5432"
     volumes:
-      - hatchet_postgres_data:/srv/hatchet/postgresql/data
+      - hatchet_postgres_data:/var/lib/postgresql/data
     healthcheck:
       test:
         [
@@ -57,7 +57,7 @@ services:
     ports:
       - "${REDIS_PORT:-6379}:6379"
     volumes:
-      - floagenticai_redis_data:/srv/floagenticai/redis/data
+      - floagenticai_redis_data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
