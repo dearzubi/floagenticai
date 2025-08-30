@@ -143,8 +143,9 @@ jobs:
             fi
 
             echo 'Building and starting services...'
+            docker compose -f docker-compose.production.yml --profile hatchet up -d
             docker compose -f docker-compose.production.yml build \$BUILD_ARGS
-            docker compose -f docker-compose.production.yml up -d \$DEPLOY_ARGS
+            COMPOSE_PARALLEL_LIMIT=4 docker compose -f docker-compose.production.yml up -d \$DEPLOY_ARGS
           "
 
       - name: Wait for health checks

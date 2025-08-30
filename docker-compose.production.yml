@@ -26,7 +26,7 @@ services:
 
   hatchet-postgres:
     image: postgres:17.6
-    command: postgres -c 'max_connections=1000'
+    command: postgres -c 'max_connections=200'
     restart: unless-stopped
     hostname: hatchet-postgres
     environment:
@@ -38,17 +38,15 @@ services:
     volumes:
       - hatchet_postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "pg_isready -d ${HATCHET_POSTGRES_DB:-hatchet} -U ${HATCHET_POSTGRES_USER:-hatchet}",
-        ]
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U ${HATCHET_POSTGRES_USER:-hatchet} -d ${HATCHET_POSTGRES_DB:-hatchet} && psql -U ${HATCHET_POSTGRES_USER:-hatchet} -d ${HATCHET_POSTGRES_DB:-hatchet} -c 'select 1' >/dev/null"]
       interval: 10s
       timeout: 10s
-      retries: 5
-      start_period: 10s
+      retries: 20
+      start_period: 20s
     networks:
       - hatchet-network
+    profiles:
+      - hatchet
 
   floagenticai-redis:
     image: redis:8.2.1
@@ -171,6 +169,7 @@ services:
   hatchet-migration:
     image: ghcr.io/hatchet-dev/hatchet/hatchet-migrate:latest
     command: /hatchet/hatchet-migrate
+    restart: on-failure
     environment:
       DATABASE_URL: postgresql://${HATCHET_POSTGRES_USER:-hatchet}:${HATCHET_POSTGRES_PASSWORD}@hatchet-postgres:5432/${HATCHET_POSTGRES_DB:-hatchet}?sslmode=disable
     depends_on:
@@ -178,6 +177,8 @@ services:
         condition: service_healthy
     networks:
       - hatchet-network
+    profiles:
+      - hatchet
 
   hatchet-setup-config:
     image: ghcr.io/hatchet-dev/hatchet/hatchet-admin:latest
@@ -202,6 +203,8 @@ services:
         condition: service_healthy
     networks:
       - hatchet-network
+    profiles:
+      - hatchet
 
   hatchet-engine:
     image: ghcr.io/hatchet-dev/hatchet/hatchet-engine:latest
@@ -223,6 +226,8 @@ services:
       - hatchet_config:/hatchet/config
     networks:
       - hatchet-network
+    profiles:
+      - hatchet
 
   hatchet-dashboard:
     image: ghcr.io/hatchet-dev/hatchet/hatchet-dashboard:latest
@@ -242,6 +247,8 @@ services:
       - hatchet_config:/hatchet/config
     networks:
       - hatchet-network
+    profiles:
+      - hatchet
 
 volumes:
   floagenticai_postgres_data:
