@@ -5,9 +5,9 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
+  Button as HeroButton,
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
-import { Button as HeroButton } from "@heroui/button";
 
 const ClearChatConfirmationModal: FC<{
   isOpen: boolean;
