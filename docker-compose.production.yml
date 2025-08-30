@@ -109,8 +109,6 @@ services:
         condition: service_healthy
       floagenticai-redis:
         condition: service_healthy
-      hatchet-engine:
-        condition: service_started
     networks:
       - floagenticai-network
       - hatchet-network
