@@ -6,6 +6,7 @@ RUN npm install -g pnpm
 
 WORKDIR /app
 
+COPY .husky ./.husky
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages/common/package.json ./packages/common/
 COPY apps/frontend/package.json ./apps/frontend/
@@ -46,6 +47,7 @@ FROM nginx:alpine3.22 AS production
 
 ENV HUSKY=0
 
+COPY .husky ./.husky
 COPY apps/frontend/nginx.conf /etc/nginx/conf.d/default.conf
 
 COPY --from=base /app/apps/frontend/dist /usr/share/nginx/html

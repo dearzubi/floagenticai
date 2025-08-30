@@ -6,6 +6,7 @@ RUN npm install -g pnpm
 
 WORKDIR /app
 
+COPY .husky ./.husky
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages/common/package.json ./packages/common/
 COPY apps/backend/package.json ./apps/backend/
@@ -27,6 +28,7 @@ RUN npm install -g pnpm
 
 WORKDIR /app
 
+COPY .husky ./.husky
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages/common/package.json ./packages/common/
 COPY apps/backend/package.json ./apps/backend/
