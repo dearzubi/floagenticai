@@ -28,7 +28,12 @@ const envSchema = z.object({
   POSTHOG_API_KEY: z.string().trim().optional(),
   ENCRYPTION_KEY: z.string().trim().nonempty(),
   HATCHET_CLIENT_TOKEN: z.string().trim().nonempty(),
-  HATCHET_CLIENT_TLS_STRATEGY: z.string().trim().default("none"),
+  HATCHET_CLIENT_TLS_STRATEGY: z.string().trim().optional().default("none"),
+  HATCHET_CLIENT_HOST_PORT: z
+    .string()
+    .trim()
+    .optional()
+    .default("localhost:7077"),
   NUMBER_OF_HATCHET_WORKERS: z.coerce.number().int().default(1),
   REDIS_HOST: z.string().trim().nonempty().default("localhost"),
   REDIS_PORT: z.coerce.number().int().default(6379),
