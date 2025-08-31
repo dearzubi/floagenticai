@@ -6,6 +6,7 @@ RUN npm install -g pnpm
 
 WORKDIR /app
 
+COPY .npmrc ./.npmrc
 COPY .husky ./.husky
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages/common/package.json ./packages/common/
