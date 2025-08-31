@@ -38,7 +38,11 @@ services:
     volumes:
       - hatchet_postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U ${HATCHET_POSTGRES_USER:-hatchet} -d ${HATCHET_POSTGRES_DB:-hatchet} && psql -U ${HATCHET_POSTGRES_USER:-hatchet} -d ${HATCHET_POSTGRES_DB:-hatchet} -c 'select 1' >/dev/null"]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -h 127.0.0.1 -U ${HATCHET_POSTGRES_USER:-hatchet} -d ${HATCHET_POSTGRES_DB:-hatchet} && psql -U ${HATCHET_POSTGRES_USER:-hatchet} -d ${HATCHET_POSTGRES_DB:-hatchet} -c 'select 1' >/dev/null",
+        ]
       interval: 10s
       timeout: 10s
       retries: 20
@@ -65,15 +69,7 @@ services:
       - floagenticai-network
     command: redis-server --appendonly yes
 
-  init-backend-logs:
-    image: busybox:1.36
-    command: sh -c "mkdir -p /app/apps/backend/logs && chown -R 1001:65533 /app/apps/backend/logs && chmod -R 775 /app/apps/backend/logs"
-    volumes:
-      - floagenticai_backend_logs:/app/apps/backend/logs
-    restart: "no"
-
   floagenticai-backend:
-    user: "1001:65533"
     build:
       context: .
       dockerfile: ./apps/backend/Dockerfile

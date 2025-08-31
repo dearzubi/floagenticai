@@ -43,11 +43,8 @@ COPY --from=base /app/apps/backend/package.json ./apps/backend/
 
 COPY apps/backend/public ./apps/backend/public
 
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S backend -u 1001
-
-RUN chown -R backend:nodejs /app
-USER backend
+RUN mkdir -p /app/apps/backend/logs && sudo chown -R 1000:1000 /app/apps/backend
+USER node
 
 EXPOSE 4000
 

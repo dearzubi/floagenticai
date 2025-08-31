@@ -142,8 +142,9 @@ jobs:
               echo 'Force recreate enabled'
             fi
 
-            echo 'Building and starting services...'
+            echo 'Building and starting hatchet services...'
             docker compose -f docker-compose.production.yml --profile hatchet up -d
+            echo 'Building and starting app services...'
             docker compose -f docker-compose.production.yml build \$BUILD_ARGS
             COMPOSE_PARALLEL_LIMIT=4 docker compose -f docker-compose.production.yml up -d \$DEPLOY_ARGS
           "
