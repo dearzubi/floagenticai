@@ -67,7 +67,7 @@ jobs:
           # Application Configuration
           BACKEND_PORT=${{ vars.BACKEND_PORT || '4000' }}
           FRONTEND_PORT=${{ vars.FRONTEND_PORT || '3000' }}
-          NODE_ENV="production"
+          NODE_ENV=production
 
           DATABASE_USER=${{ vars.DATABASE_USER || 'floagenticai' }}
           DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}
@@ -84,7 +84,7 @@ jobs:
           REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
 
           FIREBASE_PROJECT_ID=${{ vars.FIREBASE_PROJECT_ID }}
-          FIREBASE_PRIVATE_KEY="${{ secrets.FIREBASE_PRIVATE_KEY }}"
+          FIREBASE_PRIVATE_KEY=${{ secrets.FIREBASE_PRIVATE_KEY }}
           FIREBASE_CLIENT_EMAIL=${{ vars.FIREBASE_CLIENT_EMAIL }}
 
           VITE_FIREBASE_API_KEY=${{ secrets.VITE_FIREBASE_API_KEY }}
