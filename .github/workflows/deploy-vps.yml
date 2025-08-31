@@ -91,7 +91,6 @@ jobs:
 
           HATCHET_CLIENT_TOKEN=${{ secrets.HATCHET_CLIENT_TOKEN }}
           HATCHET_CLIENT_TLS_STRATEGY=${{ vars.HATCHET_CLIENT_TLS_STRATEGY || 'none' }}
-          HATCHET_CLIENT_HOST_PORT=${{ vars.HATCHET_CLIENT_HOST_PORT || 'http://hatchet-engine:7070' }}
           NUMBER_OF_HATCHET_WORKERS=${{ vars.NUMBER_OF_HATCHET_WORKERS || '1' }}
 
 

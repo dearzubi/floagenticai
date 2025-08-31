@@ -27,7 +27,6 @@ DATABASE_ENABLE_LOGGING=true | false
 ENABLE_POSTHOG=true | false
 POSTHOG_API_KEY=
 HATCHET_CLIENT_TLS_STRATEGY=defaults to 'none'
-HATCHET_CLIENT_HOST_PORT=defaults to 'http://localhost:7077'
 NUMBER_OF_HATCHET_WORKERS=1
 DISABLE_LOGGING=true | false - disable all logging (no stdout or file logging)
 DEBUG_MODE=true | false - display debug logs

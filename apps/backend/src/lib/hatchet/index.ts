@@ -4,9 +4,7 @@ import { logger } from "../../utils/logger/index.js";
 let hatchet: Hatchet;
 
 export const initHatchetClient = (): void => {
-  hatchet = Hatchet.init({
-    host_port: process.env.HATCHET_CLIENT_HOST_PORT || "http://localhost:7077",
-  });
+  hatchet = Hatchet.init();
   logger.info("Hatchet client is initialised");
 };
 
