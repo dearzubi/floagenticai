@@ -1,6 +1,6 @@
 // < ---- Following two lines: Required to use MikroORM CLI ---->
 import "dotenv/config";
-import "./utils/env-schema";
+import "./utils/env-schema.js";
 // < ---- Above two lines: Required to use MikroORM CLI ---->
 
 import { defineConfig } from "@mikro-orm/postgresql";
