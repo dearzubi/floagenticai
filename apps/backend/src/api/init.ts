@@ -36,7 +36,7 @@ export const initAPIServer = (): void => {
 
   const publicDirectoryPath = join(getBackendDirectoryAbsolutePath(), "public");
 
-  app.use("/assets", express.static(publicDirectoryPath));
+  app.use("/public/assets", express.static(publicDirectoryPath));
 
   app.use("/api/v1", RouterV1);
 

@@ -27,7 +27,7 @@ export default defineConfig({
         target: `http://localhost:${serverPort}`,
         changeOrigin: true,
       },
-      "/assets": {
+      "/public/assets": {
         target: `http://localhost:${serverPort}`,
         changeOrigin: true,
       },
