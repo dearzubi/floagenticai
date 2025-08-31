@@ -12,16 +12,6 @@ on:
         required: true
         default: "main"
         type: string
-      force_rebuild:
-        description: "Force rebuild images"
-        required: false
-        default: false
-        type: boolean
-      force_recreate:
-        description: "Force recreate containers"
-        required: false
-        default: false
-        type: boolean
 
 jobs:
   deploy:
@@ -129,24 +119,11 @@ jobs:
         run: |
           ssh ${{ vars.SSH_USER }}@${{ vars.SERVER_IP }} "
             cd /srv/floagenticai/repo
-
-            BUILD_ARGS=''
-            if [ '${{ inputs.force_rebuild }}' = 'true' ]; then
-              BUILD_ARGS='--no-cache'
-              echo 'Force rebuild enabled'
-            fi
-
-            DEPLOY_ARGS=''
-            if [ '${{ inputs.force_recreate }}' = 'true' ]; then
-              DEPLOY_ARGS='--force-recreate'
-              echo 'Force recreate enabled'
-            fi
-
             echo 'Building and starting hatchet services...'
             docker compose -f docker-compose.production.yml --profile hatchet up -d
             echo 'Building and starting app services...'
-            docker compose -f docker-compose.production.yml build \$BUILD_ARGS
-            COMPOSE_PARALLEL_LIMIT=4 docker compose -f docker-compose.production.yml up -d \$DEPLOY_ARGS
+            docker compose -f docker-compose.production.yml build --no-cache
+            COMPOSE_PARALLEL_LIMIT=4 docker compose -f docker-compose.production.yml up -d --force-recreate
           "
 
       - name: Cleanup old images
@@ -184,8 +161,6 @@ jobs:
           echo "| **Environment** | production |" >> $GITHUB_STEP_SUMMARY
           echo "| **Git Reference** | ${{ inputs.git_ref }} |" >> $GITHUB_STEP_SUMMARY
           echo "| **Server** | ${{ vars.SERVER_IP }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Force Rebuild** | ${{ inputs.force_rebuild }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Force Recreate** | ${{ inputs.force_recreate }} |" >> $GITHUB_STEP_SUMMARY
           echo "| **Deployed At** | $(date -u) |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 🎯 Access URLs" >> $GITHUB_STEP_SUMMARY
