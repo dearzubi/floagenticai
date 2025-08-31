@@ -43,7 +43,7 @@ COPY --from=base /app/apps/backend/package.json ./apps/backend/
 
 COPY apps/backend/public ./apps/backend/public
 
-RUN mkdir -p /app/apps/backend/logs && sudo chown -R 1000:1000 /app/apps/backend
+RUN mkdir -p /app/apps/backend/logs && chown -R 1000:1000 /app/apps/backend
 USER node
 
 EXPOSE 4000
