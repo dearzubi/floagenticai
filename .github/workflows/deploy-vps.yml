@@ -149,30 +149,6 @@ jobs:
             COMPOSE_PARALLEL_LIMIT=4 docker compose -f docker-compose.production.yml up -d \$DEPLOY_ARGS
           "
 
-      - name: Wait for health checks
-        run: |
-          ssh ${{ vars.SSH_USER }}@${{ vars.SERVER_IP }} "
-            cd /srv/floagenticai/repo
-
-            echo 'Waiting for services to be healthy...'
-            timeout 300 bash -c '
-              while true; do
-                # Check if all required services are running
-                backend_healthy=\$(docker compose -f docker-compose.production.yml ps floagenticai-backend --format json 2>/dev/null | jq -r \".Health // \\\"starting\\\"\")
-                frontend_healthy=\$(docker compose -f docker-compose.production.yml ps floagenticai-frontend --format json 2>/dev/null | jq -r \".Health // \\\"starting\\\"\")
-
-                echo \"Backend: \$backend_healthy, Frontend: \$frontend_healthy\"
-
-                if [[ \"\$backend_healthy\" == \"healthy\" && \"\$frontend_healthy\" == \"healthy\" ]]; then
-                  echo \"All services are healthy!\"
-                  break
-                fi
-
-                sleep 5
-              done
-            ' || echo 'Health check timeout - services may still be starting'
-          "
-
       - name: Cleanup old images
         run: |
           ssh ${{ vars.SSH_USER }}@${{ vars.SERVER_IP }} "
