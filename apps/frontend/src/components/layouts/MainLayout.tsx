@@ -1,5 +1,5 @@
 import { FC, PropsWithChildren } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate, useLocation } from "@tanstack/react-router";
 import {
   Button,
   Navbar as HeroNavbar,
@@ -14,10 +14,13 @@ import { useUserStore } from "../../stores/user.store.ts";
 const MainLayout: FC<PropsWithChildren> = ({ children }) => {
   const { theme, setTheme: _setTheme } = useTheme();
   const user = useUserStore((state) => state.user);
+  const location = useLocation();
 
   const _themeIcon = theme === "dark" ? "lucide:sun" : "lucide:moon";
 
   const navigate = useNavigate();
+
+  const isHomePage = location.pathname === "/";
 
   return (
     <div className="flex flex-col h-screen bg-background">
@@ -25,10 +28,10 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
         <NavbarBrand>
           <Link to={"/"}>
             <div className="flex items-center gap-2">
-              <div className="bg-primary-500 text-white p-1 rounded-md">
+              <div className="bg-gradient-to-br from-blue-500 to-purple-600 text-white p-1 rounded-md shadow-lg">
                 <Icon icon="lucide:workflow" width={24} />
               </div>
-              <span className="font-semibold text-lg text-primary-500">
+              <span className="font-semibold text-lg bg-gradient-to-r from-blue-600 via-purple-500 to-cyan-400 bg-clip-text text-transparent">
                 FloAgenticAI
               </span>
             </div>
@@ -37,8 +40,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
         <NavbarContent justify="end">
           {user ? (
             <Button
-              className="focus:outline-none hover:border-transparent"
-              color="primary"
+              className="focus:outline-none hover:border-transparent bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white shadow-lg hover:shadow-blue-500/25 transition-all duration-300"
               size="sm"
               variant="solid"
               onPress={() => navigate({ to: "/dashboard" })}
@@ -55,8 +57,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
               </Link>
 
               <Button
-                className="focus:outline-none hover:border-transparent"
-                color="primary"
+                className="focus:outline-none hover:border-transparent bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white shadow-lg hover:shadow-indigo-500/25 transition-all duration-300"
                 size="sm"
                 variant="solid"
                 onPress={() => navigate({ to: "/signup" })}
@@ -82,12 +83,16 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
 
       <div className="flex flex-1 overflow-hidden">
         <motion.main
-          className="flex-1 overflow-auto p-4 md:p-6"
+          className={`flex-1 overflow-auto ${!isHomePage ? "p-4 md:p-6" : ""}`}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
         >
-          <div className="max-w-7xl mx-auto">{children}</div>
+          {isHomePage ? (
+            children
+          ) : (
+            <div className="max-w-7xl mx-auto">{children}</div>
+          )}
         </motion.main>
       </div>
     </div>

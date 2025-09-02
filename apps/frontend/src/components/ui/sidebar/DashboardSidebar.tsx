@@ -94,7 +94,7 @@ const DashboardSidebar: FC<SidebarProps> = ({ isCollapsed }) => {
   return (
     <motion.aside
       className={cn(
-        "h-full bg-content1 border-r border-divider flex flex-col z-20",
+        "h-full bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-r border-gray-200/60 dark:border-gray-600/70 flex flex-col z-20 shadow-lg",
         isCollapsed ? "w-16" : "w-64",
       )}
       initial={false}
@@ -119,13 +119,35 @@ const DashboardSidebar: FC<SidebarProps> = ({ isCollapsed }) => {
               <Link to={item.to}>
                 <div
                   className={cn(
-                    "sidebar-link group",
-                    item.isActive ? "active" : "",
+                    "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-300 group",
+                    item.isActive
+                      ? "border-l-4 border-l-cyan-500 bg-cyan-50/30 dark:bg-cyan-900/10"
+                      : "hover:bg-gray-50 dark:hover:bg-gray-800/50",
                     isCollapsed ? "justify-center" : "justify-start",
                   )}
                 >
-                  <Icon icon={item.icon} width={20} />
-                  {!isCollapsed && <span>{item.label}</span>}
+                  <Icon
+                    icon={item.icon}
+                    width={20}
+                    className={cn(
+                      "transition-colors duration-300",
+                      item.isActive
+                        ? "text-cyan-600 dark:text-cyan-400"
+                        : "text-gray-500 dark:text-gray-400 group-hover:text-cyan-600 dark:group-hover:text-cyan-400",
+                    )}
+                  />
+                  {!isCollapsed && (
+                    <span
+                      className={cn(
+                        "font-medium transition-colors duration-300",
+                        item.isActive
+                          ? "text-cyan-700 dark:text-cyan-300"
+                          : "text-gray-600 dark:text-gray-300 group-hover:text-cyan-700 dark:group-hover:text-cyan-300",
+                      )}
+                    >
+                      {item.label}
+                    </span>
+                  )}
                 </div>
               </Link>
             </Tooltip>
@@ -133,7 +155,7 @@ const DashboardSidebar: FC<SidebarProps> = ({ isCollapsed }) => {
         </nav>
       </div>
 
-      <Divider />
+      <Divider className="bg-gradient-to-r from-gray-200/50 to-gray-300/50 dark:from-gray-600/50 dark:to-gray-700/50" />
 
       <div className={cn("p-4", isCollapsed ? "items-center" : "")}>
         {!isCollapsed ? (
@@ -141,20 +163,20 @@ const DashboardSidebar: FC<SidebarProps> = ({ isCollapsed }) => {
             <Link to={"/profile"}>
               <div
                 className={cn(
-                  "flex items-center gap-3 mb-4 p-2 rounded-lg transition-colors",
-                  "hover:bg-default-100",
+                  "flex items-center gap-3 mb-4 p-3 rounded-xl transition-all duration-300",
+                  "hover:bg-gray-50 dark:hover:bg-gray-800/50",
                   location.pathname === "/profile"
-                    ? "bg-primary/10 dark:bg-primary/20 shadow-sm ring-1 ring-primary/20"
+                    ? "border-l-3 border-l-cyan-500 bg-cyan-50/30 dark:bg-cyan-900/10"
                     : "",
                 )}
               >
                 <Avatar
                   src={user?.photoURL ?? ""}
                   className={cn(
-                    "flex-shrink-0 shadow",
+                    "flex-shrink-0",
                     location.pathname === "/profile"
-                      ? "ring-2 ring-primary ring-offset-2 ring-offset-background"
-                      : "",
+                      ? "ring-2 ring-cyan-500"
+                      : "ring-1 ring-gray-200 dark:ring-gray-600",
                   )}
                   size="sm"
                 />
@@ -162,12 +184,14 @@ const DashboardSidebar: FC<SidebarProps> = ({ isCollapsed }) => {
                   <p
                     className={cn(
                       "text-sm font-medium truncate",
-                      location.pathname === "/profile" && "text-primary",
+                      location.pathname === "/profile"
+                        ? "text-cyan-700 dark:text-cyan-300"
+                        : "text-gray-800 dark:text-gray-200",
                     )}
                   >
                     {user?.displayName ?? "User"}
                   </p>
-                  <p className="text-xs text-default-500 truncate">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                     {user?.email ?? ""}
                   </p>
                 </div>
@@ -176,9 +200,8 @@ const DashboardSidebar: FC<SidebarProps> = ({ isCollapsed }) => {
 
             <Button
               variant="flat"
-              color="danger"
               startContent={<Icon icon="lucide:log-out" width={16} />}
-              className="w-full justify-start"
+              className="w-full justify-start bg-gradient-to-r from-red-500/10 to-pink-500/10 hover:from-red-500/20 hover:to-pink-500/20 border border-red-300/30 hover:border-red-400/50 text-red-700 dark:text-red-300 transition-all duration-300"
               size="sm"
               onPress={handleSignOut}
             >
@@ -193,8 +216,8 @@ const DashboardSidebar: FC<SidebarProps> = ({ isCollapsed }) => {
                 className={cn(
                   "flex-shrink-0",
                   location.pathname === "/profile"
-                    ? "ring-2 ring-primary ring-offset-2 ring-offset-background shadow-lg"
-                    : "",
+                    ? "ring-2 ring-cyan-500"
+                    : "ring-1 ring-gray-200 dark:ring-gray-600 hover:ring-2 hover:ring-cyan-400 transition-all duration-300",
                 )}
                 size="sm"
               />
@@ -211,9 +234,9 @@ const DashboardSidebar: FC<SidebarProps> = ({ isCollapsed }) => {
               <Button
                 isIconOnly
                 variant="flat"
-                color="danger"
                 size="sm"
                 title="Sign Out"
+                className="bg-gradient-to-r from-red-500/10 to-pink-500/10 hover:from-red-500/20 hover:to-pink-500/20 border border-red-300/30 hover:border-red-400/50 text-red-700 dark:text-red-300 transition-all duration-300"
                 onPress={handleSignOut}
               >
                 <Icon icon="lucide:log-out" width={16} />

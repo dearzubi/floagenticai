@@ -5,6 +5,7 @@ import WorkflowRouter from "./workflow.router.js";
 import CredentialRouter from "./credential.router.js";
 import ChatRouter from "./chat.router.js";
 import MCPRouter from "./mcp.router.js";
+import MetadataRouter from "./metadata.routes.js";
 import { authValidationMiddleware } from "../middlewares/auth-validation.middleware.js";
 
 const router: Router = express.Router();
@@ -14,5 +15,6 @@ router.use("/workflow", authValidationMiddleware, WorkflowRouter);
 router.use("/credential", authValidationMiddleware, CredentialRouter);
 router.use("/chat", authValidationMiddleware, ChatRouter);
 router.use("/mcp", authValidationMiddleware, MCPRouter);
+router.use("/metadata", MetadataRouter);
 
 export default router;
