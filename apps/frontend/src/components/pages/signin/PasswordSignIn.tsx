@@ -161,8 +161,7 @@ const PasswordSignIn: FC<{
           </div>
           <Button
             type="submit"
-            color="primary"
-            className="w-full focus:outline-none hover:border-transparent"
+            className="w-full focus:outline-none hover:border-transparent bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg hover:shadow-blue-500/25 transition-all duration-300"
             size="lg"
             onPress={handlePasswordSignIn}
             isLoading={isPasswordSigningIn}
@@ -188,8 +187,7 @@ const PasswordSignIn: FC<{
           />
           <Button
             type="submit"
-            color="primary"
-            className="w-full focus:outline-none hover:border-transparent"
+            className="w-full focus:outline-none hover:border-transparent bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-lg hover:shadow-emerald-500/25 transition-all duration-300"
             size="lg"
             onPress={handleVerificationEmail}
             isLoading={isSendingEmail}
@@ -199,10 +197,9 @@ const PasswordSignIn: FC<{
           </Button>
           <Button
             type="submit"
-            color="primary"
-            className="w-full border-0"
+            className="w-full text-default-500 hover:text-default-700 bg-transparent hover:bg-default-100 transition-colors duration-200 hover:border-transparent focus:outline-none"
             size="sm"
-            variant={"bordered"}
+            variant="light"
             onPress={handleSwitchAccount}
           >
             Switch account

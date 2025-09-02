@@ -28,10 +28,10 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
         <NavbarBrand>
           <Link to={"/"}>
             <div className="flex items-center gap-2">
-              <div className="bg-primary-500 text-white p-1 rounded-md">
+              <div className="bg-gradient-to-br from-blue-500 to-purple-600 text-white p-1 rounded-md shadow-lg">
                 <Icon icon="lucide:workflow" width={24} />
               </div>
-              <span className="font-semibold text-lg text-primary-500">
+              <span className="font-semibold text-lg bg-gradient-to-r from-blue-600 via-purple-500 to-cyan-400 bg-clip-text text-transparent">
                 FloAgenticAI
               </span>
             </div>
@@ -40,8 +40,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
         <NavbarContent justify="end">
           {user ? (
             <Button
-              className="focus:outline-none hover:border-transparent"
-              color="primary"
+              className="focus:outline-none hover:border-transparent bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white shadow-lg hover:shadow-blue-500/25 transition-all duration-300"
               size="sm"
               variant="solid"
               onPress={() => navigate({ to: "/dashboard" })}
@@ -58,8 +57,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
               </Link>
 
               <Button
-                className="focus:outline-none hover:border-transparent"
-                color="primary"
+                className="focus:outline-none hover:border-transparent bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white shadow-lg hover:shadow-indigo-500/25 transition-all duration-300"
                 size="sm"
                 variant="solid"
                 onPress={() => navigate({ to: "/signup" })}

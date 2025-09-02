@@ -25,7 +25,7 @@ export const SignUpPage: FC = () => {
         </div>
 
         <Card>
-          <CardBody className="p-6">
+          <CardBody className="p-6 bg-gray-50/50 dark:bg-gray-800/30">
             <div className="space-y-6">
               <div className="space-y-4">
                 {!!errorMessage && (
