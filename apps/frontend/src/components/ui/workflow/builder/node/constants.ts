@@ -21,11 +21,11 @@ export const NODE_SETTINGS: Record<
   },
   aggregator_agent: {
     icon: "tabler:sparkles",
-    color: "#64B5F6",
+    color: "#008eff",
   },
   router_agent: {
     icon: "material-symbols:arrow-split-rounded",
-    color: "#FFB938",
+    color: "#FFA502",
   },
   one_inch_agent: {
     icon: "token-branded:1inch",
