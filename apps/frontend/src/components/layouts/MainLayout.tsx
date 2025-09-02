@@ -1,5 +1,5 @@
 import { FC, PropsWithChildren } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate, useLocation } from "@tanstack/react-router";
 import {
   Button,
   Navbar as HeroNavbar,
@@ -14,10 +14,13 @@ import { useUserStore } from "../../stores/user.store.ts";
 const MainLayout: FC<PropsWithChildren> = ({ children }) => {
   const { theme, setTheme: _setTheme } = useTheme();
   const user = useUserStore((state) => state.user);
+  const location = useLocation();
 
   const _themeIcon = theme === "dark" ? "lucide:sun" : "lucide:moon";
 
   const navigate = useNavigate();
+
+  const isHomePage = location.pathname === "/";
 
   return (
     <div className="flex flex-col h-screen bg-background">
@@ -82,12 +85,16 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
 
       <div className="flex flex-1 overflow-hidden">
         <motion.main
-          className="flex-1 overflow-auto p-4 md:p-6"
+          className={`flex-1 overflow-auto ${!isHomePage ? "p-4 md:p-6" : ""}`}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
         >
-          <div className="max-w-7xl mx-auto">{children}</div>
+          {isHomePage ? (
+            children
+          ) : (
+            <div className="max-w-7xl mx-auto">{children}</div>
+          )}
         </motion.main>
       </div>
     </div>
