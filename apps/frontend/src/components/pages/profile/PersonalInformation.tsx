@@ -63,11 +63,14 @@ const PersonalInformation: FC<{
 
   return (
     <motion.div variants={itemVariants}>
-      <Card className="overflow-visible">
+      <Card className="overflow-visible bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-2 border-gray-200/60 dark:border-gray-600/70 shadow-xl">
         <CardBody className="space-y-6">
           <div className="flex flex-col items-center md:flex-row gap-6">
             <div className="relative">
-              <Avatar src={user?.photoURL ?? ""} className="w-24 h-24 shadow" />
+              <Avatar
+                src={user?.photoURL ?? ""}
+                className="w-24 h-24 shadow-xl ring-4 ring-violet-500/20 dark:ring-violet-400/30"
+              />
               {/*{isEditing && (*/}
               {/*  <Button*/}
               {/*    isIconOnly*/}
@@ -97,9 +100,8 @@ const PersonalInformation: FC<{
                 {!isEditing ? (
                   <Button
                     isIconOnly
-                    className="focus:outline-none hover:border-transparent"
-                    color="primary"
-                    variant="light"
+                    className="focus:outline-none hover:border-transparent bg-gradient-to-r from-violet-500/10 to-purple-500/10 hover:from-violet-500/20 hover:to-purple-500/20 border border-violet-300/30 hover:border-violet-400/50 text-violet-700 dark:text-violet-300 transition-all duration-300"
+                    variant="flat"
                     onPress={() => setIsEditing(true)}
                     aria-label="Edit name"
                   >
@@ -109,8 +111,8 @@ const PersonalInformation: FC<{
                   <div className="flex gap-1">
                     <Button
                       isIconOnly
-                      color="danger"
-                      variant="light"
+                      className="bg-gradient-to-r from-red-500/10 to-pink-500/10 hover:from-red-500/20 hover:to-pink-500/20 border border-red-300/30 hover:border-red-400/50 text-red-700 dark:text-red-300 transition-all duration-300"
+                      variant="flat"
                       onPress={() => setIsEditing(false)}
                       aria-label="Cancel editing"
                     >
@@ -118,8 +120,8 @@ const PersonalInformation: FC<{
                     </Button>
                     <Button
                       isIconOnly
-                      color="success"
-                      variant="light"
+                      className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 hover:from-emerald-500/20 hover:to-teal-500/20 border border-emerald-300/30 hover:border-emerald-400/50 text-emerald-700 dark:text-emerald-300 transition-all duration-300"
+                      variant="flat"
                       onPress={handleEditName}
                       isLoading={isSaveNameInProgress}
                       aria-label="Save name"

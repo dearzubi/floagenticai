@@ -116,8 +116,7 @@ const PasswordSignUp: FC<{
 
       <Button
         type="submit"
-        color="primary"
-        className="w-full focus:outline-none hover:border-transparent"
+        className="w-full focus:outline-none hover:border-transparent bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg hover:shadow-blue-500/25 transition-all duration-300"
         size="lg"
         onPress={handlePasswordSignUp}
         isLoading={isPasswordSigningUp}

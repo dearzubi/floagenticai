@@ -46,7 +46,7 @@ const SocialAccountIdentityVerification: FC<{
         ) && (
           <Button
             variant="flat"
-            className="w-full"
+            className="w-full bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 dark:border-gray-700/30 hover:border-white/30 text-foreground shadow-lg hover:shadow-gray-500/25 transition-all duration-300"
             startContent={<Icon icon="logos:google-icon" width={18} />}
             onPress={() => handleSocialAccountVerification("google.com")}
             isLoading={inProgressSocialAccountProvider === "google.com"}
@@ -60,8 +60,8 @@ const SocialAccountIdentityVerification: FC<{
         ) && (
           <Button
             variant="flat"
-            className="w-full"
-            startContent={<Icon icon="logos:github-icon" width={18} />}
+            className="w-full bg-gradient-to-r from-gray-800 to-gray-900 hover:from-gray-700 hover:to-gray-800 text-white shadow-lg hover:shadow-gray-500/25 transition-all duration-300"
+            startContent={<Icon icon="lucide:github" width={18} />}
             onPress={() => handleSocialAccountVerification("github.com")}
             isLoading={inProgressSocialAccountProvider === "github.com"}
             isDisabled={!!inProgressSocialAccountProvider}

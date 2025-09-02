@@ -29,17 +29,19 @@ const itemVariants = {
 
 const UserProfilePage: FC = () => {
   return (
-    <motion.div
-      className="space-y-6"
-      variants={containerVariants}
-      initial="hidden"
-      animate="show"
-    >
-      <PersonalInformation itemVariants={itemVariants} />
-      <SocialAccounts itemVariants={itemVariants} />
-      <Index itemVariants={itemVariants} />
-      {/*<NotificationPreferences itemVariants={itemVariants} />*/}
-    </motion.div>
+    <div className="bg-gradient-to-br from-gray-50/50 to-violet-50/30 dark:from-gray-900/50 dark:to-violet-900/20 min-h-screen">
+      <motion.div
+        className="space-y-6 p-6"
+        variants={containerVariants}
+        initial="hidden"
+        animate="show"
+      >
+        <PersonalInformation itemVariants={itemVariants} />
+        <SocialAccounts itemVariants={itemVariants} />
+        <Index itemVariants={itemVariants} />
+        {/*<NotificationPreferences itemVariants={itemVariants} />*/}
+      </motion.div>
+    </div>
   );
 };
 

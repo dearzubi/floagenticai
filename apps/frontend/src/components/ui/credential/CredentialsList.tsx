@@ -31,19 +31,19 @@ const CredentialList: FC<{
         <Input
           isClearable
           classNames={{
-            base: "max-w-full sm:max-w-[30%]",
+            base: "max-w-full sm:max-w-[35%]",
             inputWrapper:
-              "border-1 border-default-200 bg-background hover:border-default-300 focus-within:outline-none transition-colors",
+              "bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-amber-200 dark:border-gray-700/30 hover:border-amber-300/100 focus-within:border-amber-400/100 shadow-md transition-all duration-300",
             input: "text-small",
             clearButton:
               "text-default-400 hover:text-default-600 border-none focus:outline-none bg-transparent",
           }}
-          placeholder="Search credentials by name"
+          placeholder="Search credentials by name..."
           size="md"
           startContent={
             <Icon
               icon="lucide:search"
-              className="text-default-400 pointer-events-none flex-shrink-0"
+              className="text-amber-500 pointer-events-none flex-shrink-0"
               width={18}
               height={18}
             />
@@ -66,7 +66,7 @@ const CredentialList: FC<{
         isHeaderSticky
         classNames={{
           wrapper:
-            "max-h-[calc(100vh-320px)] border border-default-200 shadow-none",
+            "max-h-[calc(100vh-320px)] bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-white/20 dark:border-gray-700/30 shadow-lg rounded-2xl",
           thead: "[&>tr]:first:shadow-none",
           tbody: "[&>tr>td:nth-child(2)]:cursor-pointer",
         }}
@@ -129,7 +129,7 @@ const CredentialList: FC<{
                 <Button
                   size="sm"
                   variant="flat"
-                  className="mt-3 focus:outline-none hover:border-transparent"
+                  className="mt-3 focus:outline-none hover:border-transparent bg-gradient-to-r from-amber-500/10 to-orange-500/10 hover:from-amber-500/20 hover:to-orange-500/20 border border-amber-300/30 hover:border-amber-400/50 transition-all duration-300"
                   onPress={() => credentialsList.setSearchTerm("")}
                   startContent={<Icon icon="lucide:x" width={16} height={16} />}
                 >
