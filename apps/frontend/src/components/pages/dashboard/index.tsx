@@ -70,7 +70,7 @@ export const DashboardPage: FC = () => {
           {stats.map((stat) => (
             <motion.div
               key={stat.name}
-              className={`${stat.borderColor} border-r-8 border-b-8 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-3 border-gray-200/60 dark:border-gray-600/70 rounded-2xl p-6 flex items-center justify-between shadow-lg hover:shadow-xl ${stat.shadowColor} hover:scale-105 transition-all duration-300`}
+              className={`${stat.borderColor} border-r-8 border-b-8 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-3 border-${stat.borderColor} dark:border-gray-600/70 rounded-2xl p-6 flex items-center justify-between shadow-lg hover:shadow-xl ${stat.shadowColor} hover:scale-105 transition-all duration-300`}
               whileHover={{ y: -2 }}
               transition={{ type: "spring", stiffness: 300 }}
             >

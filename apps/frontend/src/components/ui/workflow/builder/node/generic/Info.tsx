@@ -47,21 +47,22 @@ const Info: FC<{
   return (
     <div
       className={cn(
-        "w-fit rounded-lg bg-white font-sans transition-all duration-100 cursor-pointer border-2 shadow-sm border-gray-200 pr-4 flex items-center",
+        "w-fit rounded-xl bg-white font-sans transition-all duration-100 cursor-pointer border-2 shadow-sm border-gray-200 pr-4 flex items-center",
       )}
       style={{
-        borderColor: color,
+        border: `3px solid ${color}90`,
+        backgroundColor: `${color}10`,
       }}
     >
       <div className="flex items-center gap-2.5 p-3">
         <div
           className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-md"
           style={{
-            backgroundColor: `${color}15`,
-            border: `1px solid ${color}30`,
+            backgroundColor: `white`,
+            border: `2px solid ${color}30`,
           }}
         >
-          <Icon icon={icon} className="h-5 w-5" style={{ color }} />
+          <Icon icon={icon} className="h-5 w-5 text-white" color={color} />
         </div>
 
         <div className="min-w-0 flex-1">
