@@ -32,12 +32,12 @@ const DashboardLayout: FC<PropsWithChildren> = ({ children }) => {
         <DashboardSidebar isCollapsed={isSidebarCollapsed} />
 
         <motion.main
-          className="flex-1 overflow-auto p-4 md:p-6"
+          className="flex-1 overflow-auto w-full"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
         >
-          <div className="max-w-7xl mx-auto">{children}</div>
+          {children}
         </motion.main>
       </div>
     </div>

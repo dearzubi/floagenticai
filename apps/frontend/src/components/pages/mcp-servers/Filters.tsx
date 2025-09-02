@@ -53,10 +53,11 @@ const Filters: FC<{
               key={category}
               size="md"
               variant={selectedCategory === category ? "solid" : "bordered"}
-              color={selectedCategory === category ? "primary" : "default"}
               className={cn(
-                "cursor-pointer transition-all duration-200 ",
-                selectedCategory !== category ? "hover:bg-default-100" : "px-2",
+                "cursor-pointer transition-all duration-300 ",
+                selectedCategory !== category
+                  ? "hover:bg-default-100"
+                  : "bg-indigo-500 text-white hover:bg-indigo-500/90",
               )}
               onClick={() => handleCategoryFilter(category)}
               endContent={

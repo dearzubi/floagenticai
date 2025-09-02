@@ -52,7 +52,7 @@ const MCPServerCard: FC<{
       <motion.div variants={cardVariants} layout>
         <Card
           className={cn(
-            "h-full min-h-[280px] shadow-sm border border-default-300",
+            "h-full min-h-[280px] bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-2 border-gray-200/60 dark:border-gray-600/70 shadow-lg transition-all duration-300 ring-2 ring-gray-300/30 dark:ring-gray-600/40",
           )}
         >
           <CardBody className="p-4 flex flex-col h-full">
@@ -66,23 +66,22 @@ const MCPServerCard: FC<{
                     radius="md"
                   />
                 ) : (
-                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                  <div className="w-12 h-12 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-xl flex items-center justify-center border border-indigo-300/30 shadow-lg">
                     <Icon
                       icon="lucide:server"
-                      className="w-6 h-6 text-primary"
+                      className="w-6 h-6 text-indigo-600"
                     />
                   </div>
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="text-lg font-semibold truncate">
+                <h3 className="text-lg font-semibold truncate text-gray-800 dark:text-gray-200">
                   {server.label}
                 </h3>
                 <Chip
                   size="sm"
                   variant="flat"
-                  color="default"
-                  className="mb-3 bg-default-100 text-default-500"
+                  className="mb-3 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
                 >
                   {server.category}
                 </Chip>
@@ -94,8 +93,8 @@ const MCPServerCard: FC<{
                   className={cn(
                     "mb-3",
                     installation?.status === "enabled"
-                      ? "text-success-500 border border-success-400"
-                      : "text-default-500 border border-default-400",
+                      ? "text-emerald-600 border border-emerald-400 bg-emerald-50/50 dark:bg-emerald-900/20"
+                      : "text-gray-600 border border-gray-400 bg-gray-50/50 dark:bg-gray-800/50",
                   )}
                 >
                   {installation?.status}
@@ -104,7 +103,7 @@ const MCPServerCard: FC<{
             </div>
 
             <div className="flex-1 mb-4">
-              <p className="text-default-600 text-sm">
+              <p className="text-default-700 dark:text-default-300 text-sm leading-relaxed">
                 {truncateDescription(
                   installation?.description || server.description,
                 )}
@@ -121,13 +120,15 @@ const MCPServerCard: FC<{
                     key={tool}
                     size="sm"
                     variant="bordered"
-                    color="default"
-                    className="text-xs px-2"
+                    className="text-xs px-1 bg-default-50 border border-default-300/30 text-default-800 dark:text-blue-300"
                     startContent={
-                      <Icon icon="lucide:wrench" className="w-3 h-3" />
+                      <Icon
+                        icon="lucide:wrench"
+                        className="w-3 h-3 text-default-800"
+                      />
                     }
                   >
-                    {tool}
+                    <span className={"px-1"}>{tool}</span>
                   </Chip>
                 ))}
                 {(isInstalled && installation
@@ -136,8 +137,7 @@ const MCPServerCard: FC<{
                   <Chip
                     size="sm"
                     variant="flat"
-                    color="default"
-                    className="text-xs"
+                    className="text-xs bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 text-gray-600 dark:text-gray-300"
                   >
                     +
                     {isInstalled && installation
@@ -154,23 +154,21 @@ const MCPServerCard: FC<{
                     <Button
                       size="sm"
                       variant="flat"
-                      color="secondary"
                       startContent={
                         <Icon icon="lucide:settings" className="w-4 h-4" />
                       }
                       onPress={() => onConfigure?.(installation)}
                       title="Configure"
-                      className="flex-1 focus:outline-none hover:border-transparent "
+                      className="flex-1 focus:outline-none bg-gradient-to-r from-indigo-500/10 to-purple-500/10 hover:from-indigo-500/20 hover:to-purple-500/20 border border-indigo-300/30 hover:border-indigo-400/50 text-indigo-700 dark:text-indigo-300 transition-all duration-300"
                     >
                       Configure
                     </Button>
                     <Button
                       size="sm"
                       variant="flat"
-                      color="danger"
                       onPress={() => onUninstall?.(installation)}
                       title="Uninstall"
-                      className="flex-1 focus:outline-none hover:border-transparent"
+                      className="flex-1 focus:outline-none bg-gradient-to-r from-red-500/10 to-pink-500/10 hover:from-red-500/20 hover:to-pink-500/20 border border-red-300/30 hover:border-red-400/50 text-red-700 dark:text-red-300 transition-all duration-300"
                       startContent={
                         <Icon icon="lucide:trash-2" className="w-4 h-4" />
                       }
@@ -186,7 +184,7 @@ const MCPServerCard: FC<{
                       startContent={
                         <Icon icon="lucide:eye" className="w-4 h-4" />
                       }
-                      className="flex-1 bg-default-200 focus:outline-none hover:border-transparent"
+                      className="flex-1 focus:outline-none bg-gradient-to-r from-gray-500/10 to-slate-500/10 hover:from-gray-500/20 hover:to-slate-500/20 border border-gray-300/30 hover:border-gray-400/50 text-gray-700 dark:text-gray-300 transition-all duration-300"
                       onPress={onOpen}
                     >
                       Details
@@ -198,7 +196,7 @@ const MCPServerCard: FC<{
                         <Icon icon="lucide:download" className="w-4 h-4" />
                       }
                       onPress={() => onInstall?.(server)}
-                      className="flex-1 focus:outline-none hover:border-transparent bg-primary-400 text-white"
+                      className="flex-1 focus:outline-none hover:border-transparent bg-indigo-500 hover:from-indigo-500/90 hover:to-purple-500/90 text-white shadow-lg hover:shadow-indigo-500/25 transition-all duration-300"
                     >
                       Install
                     </Button>

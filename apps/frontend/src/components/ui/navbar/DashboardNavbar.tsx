@@ -3,10 +3,6 @@ import {
   NavbarBrand,
   NavbarContent,
   Button,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
   cn,
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
@@ -51,10 +47,10 @@ const DashboardNavbar: FC<NavbarProps> = ({ onMenuToggle, isSmallScreen }) => {
       <NavbarBrand>
         <Link to={"/"}>
           <div className="flex items-center gap-2">
-            <div className="bg-primary-500 text-white p-1 rounded-md">
+            <div className="bg-gradient-to-br from-blue-500 to-purple-600 text-white p-1 rounded-md shadow-lg">
               <Icon icon="lucide:workflow" width={24} />
             </div>
-            <span className="font-semibold text-lg text-primary-500">
+            <span className="font-semibold text-lg bg-gradient-to-r from-blue-600 via-purple-500 to-cyan-400 bg-clip-text text-transparent">
               FloAgenticAI
             </span>
           </div>
@@ -62,22 +58,36 @@ const DashboardNavbar: FC<NavbarProps> = ({ onMenuToggle, isSmallScreen }) => {
       </NavbarBrand>
 
       <NavbarContent justify="end">
-        <Dropdown placement="bottom-end">
+        {/* Notification bell - commented out until functionality is implemented */}
+        {/*<Dropdown placement="bottom-end">
           <DropdownTrigger>
             <Button
               isIconOnly
               variant="light"
-              className="text-default-500"
+              className="text-default-500 hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-colors duration-300"
               aria-label="Notifications"
             >
               <Icon icon="lucide:bell" width={20} />
             </Button>
           </DropdownTrigger>
-          <DropdownMenu aria-label="Notifications">
-            <DropdownItem key="new">New notifications</DropdownItem>
-            <DropdownItem key="empty">No new notifications</DropdownItem>
+          <DropdownMenu
+            aria-label="Notifications"
+            className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border border-gray-200/60 dark:border-gray-600/70 shadow-2xl"
+          >
+            <DropdownItem
+              key="new"
+              className="hover:bg-blue-50 dark:hover:bg-blue-900/20"
+            >
+              New notifications
+            </DropdownItem>
+            <DropdownItem
+              key="empty"
+              className="hover:bg-gray-50 dark:hover:bg-gray-800/50"
+            >
+              No new notifications
+            </DropdownItem>
           </DropdownMenu>
-        </Dropdown>
+        </Dropdown>*/}
 
         {/*<Dropdown placement="bottom-end">*/}
         {/*  <DropdownTrigger>*/}

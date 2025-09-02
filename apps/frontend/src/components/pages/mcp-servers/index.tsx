@@ -198,9 +198,9 @@ const MCPServersPage: FC = () => {
   };
 
   return (
-    <>
+    <div className="bg-gradient-to-br from-gray-50/20 to-indigo-100/20 dark:from-gray-900/50 dark:to-indigo-900/20 min-h-screen">
       <motion.div
-        className="p-6 space-y-6 max-w-7xl mx-auto"
+        className="p-6 space-y-6"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
@@ -302,7 +302,7 @@ const MCPServersPage: FC = () => {
         installation={installationToUninstall}
         isPending={deleteMutation.isPending}
       />
-    </>
+    </div>
   );
 };
 

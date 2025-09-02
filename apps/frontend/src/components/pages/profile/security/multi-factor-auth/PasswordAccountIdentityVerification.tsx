@@ -55,9 +55,8 @@ const PasswordAccountIdentityVerification: FC<{
         }
       />
       <Button
-        className="focus:outline-none hover:border-transparent shrink-0"
-        color="primary"
-        variant="flat"
+        className="focus:outline-none hover:border-transparent shrink-0 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-lg hover:shadow-violet-500/25 transition-all duration-300"
+        variant="solid"
         onPress={handlePasswordVerification}
         isLoading={isVerifyingPassword}
         isDisabled={isVerifyingPassword}

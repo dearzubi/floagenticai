@@ -65,9 +65,8 @@ const ChangePassword: FC = () => {
         </div>
         <Button
           variant="flat"
-          color="primary"
           size="sm"
-          className={"focus:outline-none hover:border-transparent"}
+          className="focus:outline-none hover:border-transparent bg-gradient-to-r from-violet-500/10 to-purple-500/10 hover:from-violet-500/20 hover:to-purple-500/20 border border-violet-300/30 hover:border-violet-400/50 text-violet-700 dark:text-violet-300 transition-all duration-300"
           isDisabled={false}
           onPress={() => setIsPasswordModalOpen(true)}
         >
@@ -170,16 +169,14 @@ const ChangePassword: FC = () => {
               </ModalBody>
               <ModalFooter>
                 <Button
-                  className="focus:outline-none hover:border-transparent"
+                  className="focus:outline-none hover:border-transparent bg-gradient-to-r from-red-500/10 to-pink-500/10 hover:from-red-500/20 hover:to-pink-500/20 border border-red-300/30 hover:border-red-400/50 text-red-700 dark:text-red-300 transition-all duration-300"
                   variant="flat"
-                  color="danger"
                   onPress={onClose}
                 >
                   Cancel
                 </Button>
                 <Button
-                  className="focus:outline-none hover:border-transparent"
-                  color="primary"
+                  className="focus:outline-none hover:border-transparent bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-lg hover:shadow-violet-500/25 transition-all duration-300"
                   onPress={handlePasswordChange}
                   isLoading={isPasswordChangeInProgress}
                   isDisabled={isPasswordChangeInProgress}

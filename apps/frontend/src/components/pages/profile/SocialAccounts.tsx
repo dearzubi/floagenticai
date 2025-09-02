@@ -39,9 +39,11 @@ const SocialAccounts: FC<{
 
   return (
     <motion.div variants={itemVariants}>
-      <Card>
-        <CardHeader className="flex gap-3">
-          <h2 className="text-lg font-semibold">Linked Social Accounts</h2>
+      <Card className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-2 border-gray-200/60 dark:border-gray-600/70 shadow-xl">
+        <CardHeader className="flex gap-3 border-b border-gray-200/30 dark:border-gray-600/30">
+          <h2 className="text-lg font-semibold bg-gradient-to-r from-violet-600 to-purple-600 dark:from-violet-400 dark:to-purple-400 bg-clip-text text-transparent">
+            Linked Social Accounts
+          </h2>
         </CardHeader>
         <CardBody>
           <div className="flex flex-col space-y-4">
@@ -65,10 +67,10 @@ const SocialAccounts: FC<{
                 </div>
 
                 <Button
-                  className={`text-xs px-1 py-1 min-w-28 rounded-full cursor-pointer focus:outline-none hover:border-transparent ${
+                  className={`text-xs px-1 py-1 min-w-28 rounded-full cursor-pointer focus:outline-none hover:border-transparent transition-all duration-300 ${
                     account.connected
-                      ? "bg-danger-100 text-danger-700"
-                      : "bg-primary-100 text-primary-700"
+                      ? "bg-gradient-to-r from-red-500/10 to-pink-500/10 hover:from-red-500/20 hover:to-pink-500/20 border border-red-300/30 hover:border-red-400/50 text-red-700 dark:text-red-300"
+                      : "bg-gradient-to-r from-violet-500/10 to-purple-500/10 hover:from-violet-500/20 hover:to-purple-500/20 border border-violet-300/30 hover:border-violet-400/50 text-violet-700 dark:text-violet-300"
                   }`}
                   startContent={
                     account.connected ? (
