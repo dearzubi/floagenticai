@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.2.0](https://github.com/dearzubi/floagenticai/compare/v0.1.0...v0.2.0) (2025-09-02)
+
+### Features
+
+* add redesigned home page ([9bfb879](https://github.com/dearzubi/floagenticai/commit/9bfb8797db3f83d29dfa3f998b4f46492a8a327c))
+* enhance colors on signin and signup pages ([7bc35a0](https://github.com/dearzubi/floagenticai/commit/7bc35a03eafcc80405546e303b7c37fe37e2a4a3))
+* recolor workflow canvas nodes ([6bc9421](https://github.com/dearzubi/floagenticai/commit/6bc942169c3cbeee65930af4ff3877af03e1eb55))
+* revamp UI for dashboard and related components with improved color styling and layout ([d96f319](https://github.com/dearzubi/floagenticai/commit/d96f3197ecc2b2b66c9b68add58112ed8477bb87))
+* update styling for node Info component and fix border colors in dashboard cards ([2f595fe](https://github.com/dearzubi/floagenticai/commit/2f595febc441e5c5533b78cdc4d0008fdd94c90f))
+
+### Bug Fixes
+
+* fix backend assets url path conflicting with vite's asset path during production ([efe527f](https://github.com/dearzubi/floagenticai/commit/efe527f574d7dd600312b7b5802dcbc19c388500))
+* fix Cannot find module '/app/apps/backend/dist/utils/env-schema' imported from /app/apps/backend/dist/mikro-orm.config.js ([3d83829](https://github.com/dearzubi/floagenticai/commit/3d8382953eca87272dc61f385298c4a8b93a9eeb))
+* fix connection to hatchet engine from inside container by following docs ([d79e9ce](https://github.com/dearzubi/floagenticai/commit/d79e9ce4350de31d43a30a88addad05b8e587e3c))
+* fix connection to hatchet engine from inside container by following docs ([664f084](https://github.com/dearzubi/floagenticai/commit/664f084749bf34dc9257a8573881aca823980797))
+* fix hatchet client unable to connect to engine inside docker ([eed7931](https://github.com/dearzubi/floagenticai/commit/eed7931130f6757729141f1555aa14aa109618b7))
+* fix missing hatchet init configuration to connect to engine properly ([785de3b](https://github.com/dearzubi/floagenticai/commit/785de3bdc66709ed6e7f07a604edea0485610fd1))
+
 ## 0.1.0 (2025-08-29)
 
 ### Features
