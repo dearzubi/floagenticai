@@ -20,12 +20,30 @@ let socketIO: SocketIOServer<
 >;
 
 export const initSocketIO = (): void => {
+  const isDevelopment = process.env.NODE_ENV === "development";
+
+  let corsOrigin: boolean | string[];
+  if (isDevelopment) {
+    corsOrigin = true;
+  } else {
+    corsOrigin =
+      process.env.CORS_ALLOWED_ORIGINS?.split(",")
+        .map((origin) => origin.trim())
+        .filter((origin) => origin.length > 0) || [];
+  }
+
   socketIO = new SocketIOServer<
     ClientToServerEvents,
     ServerToClientEvents,
     InterServerEvents,
     SocketData
-  >(getAPIServer());
+  >(getAPIServer(), {
+    cors: {
+      origin: corsOrigin,
+      credentials: true,
+      methods: ["GET", "POST"],
+    },
+  });
   socketIO.use(authValidationMiddleware);
   socketIO.on("connection", (socket) => {
     logger.info(`Socket connected: ${socket.id}`);
@@ -47,7 +65,7 @@ export const initSocketIO = (): void => {
 
 export const getSocketIO = (): SocketIOServer => {
   if (!socketIO) {
-    socketIO = new SocketIOServer(getAPIServer());
+    initSocketIO();
   }
   return socketIO;
 };

@@ -55,6 +55,7 @@ const envSchema = z.object({
     })
     .optional()
     .default(false),
+  CORS_ALLOWED_ORIGINS: z.string().trim().optional().default(""),
 });
 
 const envServerSchemaResult = envSchema.safeParse(process.env);
