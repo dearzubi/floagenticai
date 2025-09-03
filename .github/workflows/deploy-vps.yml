@@ -58,6 +58,7 @@ jobs:
           BACKEND_PORT=${{ vars.BACKEND_PORT || '4000' }}
           FRONTEND_PORT=${{ vars.FRONTEND_PORT || '3000' }}
           NODE_ENV=production
+          CORS_ALLOWED_ORIGINS=${{ vars.CORS_ALLOWED_ORIGINS }}
 
           DATABASE_USER=${{ vars.DATABASE_USER || 'floagenticai' }}
           DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}

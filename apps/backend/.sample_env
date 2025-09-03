@@ -33,6 +33,7 @@ DEBUG_MODE=true | false - display debug logs
 DISABLE_FILE_LOGGING=true | false - disable file logging
 NODE_ENV=development | production - Defaults to development
 PORT=Express server port, e.g. 4000 - Defaults to 4000
+CORS_ALLOWED_ORIGINS=comma,separated,allowed,origins - Defaults to undefined which allows all origins
 
 # ------------------------------
 # REQUIRED HATCHET ENV VARIABLES
