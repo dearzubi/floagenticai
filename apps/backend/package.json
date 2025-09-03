@@ -49,6 +49,7 @@
     "@openrouter/ai-sdk-provider": "0.7.5",
     "axios": "^1.9.0",
     "common": "workspace:*",
+    "cors": "^2.8.5",
     "dayjs": "^1.11.13",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
@@ -70,6 +71,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.1",
     "@types/lodash": "^4.17.18",
     "@types/lodash-es": "^4.17.12",

@@ -7,6 +7,7 @@ import { getBackendDirectoryAbsolutePath } from "../utils/misc.js";
 import { User } from "../database/entities/user.entity.js";
 import { InternalServerError } from "../utils/errors/internal-server.error.js";
 import { createServer } from "http";
+import { createCorsMiddleware } from "../utils/cors/index.js";
 
 const app: Express = express();
 const httpServer = createServer(app);
@@ -25,6 +26,7 @@ declare global {
  * Sets up middlewares, routes, and initializes the API server using Express.js.
  */
 export const initAPIServer = (): void => {
+  app.use(createCorsMiddleware());
   app.use(morganMiddleware);
 
   app.use(express.json({ limit: "10mb" }));
